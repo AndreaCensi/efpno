@@ -2,8 +2,23 @@ import networkx as nx
 from efpno.parsing.parse import parse
 from efpno.parsing.structures import AddVertex2D, AddEdge2D 
 from .utils import SE2_to_distance, check_proper
-from geometry.manifolds import SE2
+from geometry import SE2 
 
+EUCLIDEAN2D = 'E2D'
+
+class TestCase(object):
+    def __init__(self, tcid, G, geometry=EUCLIDEAN2D):
+        self.tcid = tcid
+        self.G = G
+        self.has_ground_truth = False
+        self.geometry = geometry
+        
+    def is_spherical(self):
+        return self.geometry == 'S'
+    
+    def is_euclidean(self):
+        return self.geometry == 'E'
+    
 def load_graph(filename):
     G = nx.DiGraph()
     raise_if_unknown = True
@@ -24,3 +39,7 @@ def load_graph(filename):
             count += 1
     check_proper(G)
     return G
+
+def load_log_tc(filename):
+    tc = TestCase(filename, G=load_graph(filename))
+    return tc
