@@ -1,0 +1,6 @@
+*.pyc
+*.egg-info
+g2o
+pickle
+*.pickle
+.compmake_history.txt
