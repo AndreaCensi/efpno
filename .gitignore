@@ -4,3 +4,5 @@ g2o
 pickle
 *.pickle
 .compmake_history.txt
+out
+hog-man
