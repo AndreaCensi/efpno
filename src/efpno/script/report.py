@@ -134,10 +134,6 @@ def report_add_coordinates_and_edges(r, nid, S, G,
 
 
 
-def create_report_comb_stats(comb_id, tc_ids, alg_ids, deps):
-    r = Report('set-%s' % comb_id)
-    return r
-
 def create_tables_for_paper(comb_id, tc_ids, alg_ids, deps):
     pass
  

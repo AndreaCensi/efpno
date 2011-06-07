@@ -1,4 +1,4 @@
-import networkx as nx
+import networkx as nx #@UnresolvedImport
 import os
 import itertools
 from geometry import mds, place
@@ -9,8 +9,9 @@ from efpno.script.utils import reconstruct, SE2_to_distance
 
 from efpno.script.report import (create_report_tc, create_tables_for_paper,
                                  create_tables_for_paper,
-                                 create_report_comb_stats,
                                  create_report_execution)
+
+from .tables import create_report_comb_stats
 
 from networkx import  single_source_shortest_path #@UnresolvedImport
 from optparse import OptionParser, OptionGroup
@@ -256,9 +257,9 @@ def write_report(report, filename):
 
 def run_combination(tcid, tc, algo_class, algo_params):
     tc.tcid = tcid
-    print('Running %s - %s(%s)' % (tc, algo_class.__name__, algo_params))
+    print('Running %s - %s(%s)' % (tcid, algo_class.__name__, algo_params))
     algo = algo_class(algo_params)
-    results = algo.solve(tc.G)
+    results = algo.solve_main(tc)
     
     other = {'algo_class': algo_class,
              'combid': '%s-%s' % (tc.tcid, algo),

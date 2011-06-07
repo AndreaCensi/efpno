@@ -6,7 +6,7 @@ import numpy as np
 import networkx as nx #@UnresolvedImport
 from networkx import  single_source_shortest_path #@UnresolvedImport
 
-from efpno.script.performance import distances_metrics, distances_matrix_metrics, \
+from efpno.script.performance import  distances_matrix_metrics, \
     distances_metrics_print, constraints_and_observed_distances, graph_errors, \
     graph_errors_print
 import itertools
@@ -18,8 +18,18 @@ class Algorithm:
         self.params = params
 
     def solve_main(self, tc):
-        G = tc['G']
+        G = tc.G
         results = self.solve(G)
+
+        def add_to_main(main, d, prefix):
+            for k, v in d.items():
+                main['%s-%s' % (prefix, k)] = v
+    
+        add_to_main(results, results.get('lstats', {}), 'landmarks-relstats')
+        add_to_main(results, results.get('lgstats', {}), 'landmarks-gstats')
+        add_to_main(results, results.get('stats', {}), 'all-relstats')
+        
+        print ' %.4f\n'.join(results.keys())
         return results
     
     def phase(self, name):
@@ -56,17 +66,17 @@ class EFPNO3(Algorithm):
             self.phase('solving euclidean')
             G2, Sl, Dl = solve_euclidean(landmarks_subgraph)
             self.phase('computing metric for landmarks')
-            lgstats = graph_errors(constraints=landmarks_subgraph, solution=G2)
-            print(graph_errors_print('landmark-relative', lgstats))
-            results['lgstats'] = lgstats
         elif lmode == 'reduce':
             G2, Sl, Dl, Sall, Dall = solve_by_reduction(landmarks_subgraph)
+            lgstats = graph_errors(constraints=landmarks_subgraph, solution=G2)
+            print(graph_errors_print('landmark-gstats', lgstats))
+            results['lgstats'] = lgstats
         else: raise Exception('unknown lmode %r' % lmode)
         
         Sl_d = euclidean_distances(Sl)
         lstats = distances_matrix_metrics(Dl, Sl_d)
     
-        print(distances_metrics_print('landmark-relative', lstats))
+        print(distances_metrics_print('landmark-relstats', lstats))
         
         self.phase('Putting other nodes')
         S = place_other_nodes(G, paths, landmarks, Sl, nref)
@@ -74,7 +84,7 @@ class EFPNO3(Algorithm):
         
         self.phase('computing stats')
         stats = constraints_and_observed_distances(G, S)
-        print(distances_metrics_print('all-relative', stats))
+        print(distances_metrics_print('all-relstats', stats))
 
         self.phase('Done!')
         
