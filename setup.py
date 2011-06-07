@@ -42,6 +42,7 @@ setup(name='efpno',
         entry_points={
          'console_scripts': [
            'efpno_test_parsing_stream = efpno.parsing.parse:main',
+           'efpno_floyd_bench = efpno.script.floyd_bench:main',
         ]
     }
 
