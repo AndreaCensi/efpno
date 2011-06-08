@@ -1,6 +1,4 @@
 from reprep import Report
-from contracts import contract
-from geometry import assert_allclose
 import numpy as np
 from efpno.script.performance import constraints_and_observed_distances, \
     graph_errors_print
@@ -15,7 +13,8 @@ def create_report_execution(exc_id,
     f = r.figure('misc', cols=3) 
     
     for w in ['gstats', 'lgstats']:
-        r.text(w, graph_errors_print(w, results[w]))
+        if w in results:
+            r.text(w, graph_errors_print(w, results[w]))
 
     G = tc.G
     landmarks = results['landmarks']
@@ -34,9 +33,10 @@ def create_report_execution(exc_id,
     else:
         print("could not find G_landmarks")
     
-    for u, v in G.edges():
-        G_all.add_edge(u, v, **G[u][v]) 
+        
     if G_all is not None: 
+        for u, v in G.edges():
+            G_all.add_edge(u, v, **G[u][v]) 
         print('plotting full solution %s' % G_all.number_of_nodes())
         report_add_coordinates_and_edges(r, 'G_all', G=G_all,
                                          landmarks=landmarks,

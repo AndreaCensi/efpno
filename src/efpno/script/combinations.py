@@ -9,14 +9,15 @@ Combination = namedtuple('Combination', 'algorithms test_cases')
 def get_everything():
     
     algorithms = [
-#        ('Efast', (EFPNO3, dict(nref=3, nl=48, lmode='euclidean'))),
-        ('EfastR', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False))),
-        ('EfastR', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
-        ('EfastRm', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=True))),
+        ('Efast', (EFPNO3, dict(nref=3, nl=50, lmode='euclidean'))),
+        ('EfastR', (EFPNO3, dict(nref=3, nl=50, lmode='reduce', multi=False))),
+#        ('EfastRi', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
+#        ('EfastRm', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=True))),
 #        ('Eslow', (EFPNO3, dict(nref=3, nl=100, lmode='euclidean'))),
         ('EslowR', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=False))),
-        ('EslowRm', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=True)))
-
+#        ('EslowRm', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=True))),
+        ('EslugR', (EFPNO3, dict(nref=3, nl=150, lmode='reduce', multi=False))),
+        
     ]
     
     logs = [
@@ -27,8 +28,9 @@ def get_everything():
     sets = {}
     
     sets['tmp'] = Combination(['E*'], 'intel')
-    sets['tmp'] = Combination(['EfastR', 'EfastRi'], 'intel')
+    sets['tmp2'] = Combination(['EfastR', 'EfastRi'], 'intel')
 
+    sets['tmp3'] = Combination(['EslugR'], 'man3500')
     
     sets['all'] = Combination('*', '*')
     

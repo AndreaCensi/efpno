@@ -16,6 +16,7 @@ import time
 from geometry.manifolds import SE2
 from contracts.main import contract
 from efpno.script.markers import poses2markers, markers2poses
+from geometry.mds import mds_randomized
 
 class Algorithm:
     def __init__(self, params):
@@ -75,6 +76,8 @@ class EFPNO3(Algorithm):
 #        ndim = 2
         results = {}  
 
+#        dijkstra_path(G,source,target, weight = 'weight'):
+        
         self.phase('compute:shortest_path')
         paths = {}
         for i, l in enumerate(landmarks):
@@ -118,10 +121,13 @@ class EFPNO3(Algorithm):
                 G_all = place_other_nodes_simple(G=G, paths=paths,
                                              landmarks=landmarks,
                                              landmarks_solution=G_landmarks)
-            
+            if improve:
+                self.phase('compute:improvement')
+                G_all = improve_guess(G, G_all)
+                
             self.phase('stats:computing graph_errors')
             # note that this is a dense graph
-            if True:
+            if False:
                 lgstats = graph_errors(constraints=landmarks_subgraph,
                                        solution=G_landmarks)
                 print(graph_errors_print('landmark-gstats', lgstats))
@@ -149,14 +155,17 @@ class EFPNO3(Algorithm):
         return results
 
 def extract_distances(G):
+    # TODO: check dense
     n = G.number_of_nodes()
     D = np.zeros((n, n))
-    for i, j  in itertools.product(range(n), range(n)):
-        D[i, j] = G[i][j]['dist']
-        if i == j:
-            assert_allclose(D[i, j], 0)
-        else:
-            assert D[i, j] > 0, D[i, j]
+    it2node = G.nodes()
+#    node2it = dict([(node, it) for it, node in enumerate(it2node) ])
+    for i, j in itertools.product(range(n), range(n)):
+        if i == j: continue
+        u = it2node[i]
+        v = it2node[j]
+        D[i, j] = G[u][v]['dist']
+        assert D[i, j] > 0
     return D
 
 def solve_euclidean(G):
@@ -173,38 +182,27 @@ def solve_euclidean(G):
         G2.add_node(i, pose=node_pose)
     return G2, S, D
 
+def markers_constraints(G, scale=1):
+    n = G.number_of_nodes()
+    Dall = np.ones((3 * n, 3 * n)) * np.inf
+    it2node = G.nodes()
+    node2it = dict([(node, it) for it, node in enumerate(it2node) ])
+    for u, v in G.edges():
+        i = node2it[u]
+        j = node2it[v]        
+        pose = G[u][v]['pose']
+        markers = poses2markers([ SE2.unity(), pose], scale=scale)
+        Dset = euclidean_distances(markers)
+        indices = [i, j, i + n, j + n, i + 2 * n, j + 2 * n]
+        for r, s in itertools.product(range(6), range(6)):
+            Dall[indices[r], indices[s]] = Dset[r, s]
+    return Dall
+    
 def solve_by_reduction(G, scale=1):
     n = G.number_of_nodes()
-    Dall = np.zeros((3 * n, 3 * n))
-#
-#    Srel = np.zeros((3, 3))
-#    Srel[:, 0] = [0, 0, 1] * scale
-#    Srel[:, 1] = [-1, 0.5, 1] * scale
-#    Srel[:, 2] = [-1, -0.5, 1] * scale
-#    
-    it2node = G.nodes()
-    for i, j  in itertools.product(range(n), range(n)):
-        if i == j: continue
-        pose = G[it2node[i]][it2node[j]]['pose']
-#        Sset = np.zeros((2, 6))
-#        Sset[:, 0:3] = Srel[:2, :]
-#        Sset[:, 3:6] = np.dot(pose, Srel)[:2, :]
-#        Dset = euclidean_distances(Sset)
-#        
-#        
-        markers = poses2markers([ SE2.unity(), pose])
-        Dset2 = euclidean_distances(markers)
-#        perm = [0, 2, 4, 1, 3, 5]
-#        Dset2 = Dset2[perm, :][:, perm]
-#            
-#        assert_allclose(Dset, Dset2)
-        
-        indices = [i, i + n, i + 2 * n, j, j + n, j + 2 * n]
-        indices2 = [i, j, i + n, j + n, i + 2 * n, j + 2 * n]
-        for u, v in itertools.product(range(6), range(6)):
-#            Dall[indices[u], indices[v]] = Dset[u, v]
-            Dall[indices2[u], indices2[v]] = Dset2[u, v]
-
+    print('solve_by_reduction: Markers constraints')
+    Dall = markers_constraints(G, scale=scale)
+    print('solve_by_reduction: MDS')
     Sall = mds(Dall, 2)
     # Check that we have the correct orientation
     areas = np.array([area(Sall[:, i], Sall[:, i + n], Sall[:, i + 2 * n]) 
@@ -214,17 +212,11 @@ def solve_by_reduction(G, scale=1):
         Sall[0, :] = -Sall[0, :]
     
     G2 = nx.DiGraph() 
-    
+    print('solve_by_reduction: marker to pose')
     poses = markers2poses(Sall)
+    it2node = G.nodes()
     for i, pose in enumerate(poses):
         G2.add_node(it2node[i], pose=pose)
-#    
-#    for i in range(n):
-#        head = Sall[:, i]
-#        tail = 0.5 * (Sall[:, i + n] + Sall[:, i + 2 * n]) 
-#        theta = direction(tail, head)
-#        node_pose = SE2_from_translation_angle(head, theta) 
-#                
     return G2
 
 
@@ -350,22 +342,37 @@ def solve_dense(G, fix_node=None, fix_pose=SE2.unity()):
     return G2  
     
 
-def improve(G, G_guess):
+def improve_guess(G, G_guess):
+    n = G.number_of_nodes()
     nodes = G.nodes()
-    poses_guess = get_poses(G_guess, nodes)
+    poses_guess = [ G_guess.node[u]['pose'] for u in nodes]
+    print('Computing markers') 
     markers = poses2markers(poses_guess) # 2 x 3*n array
-    D = euclidean_distances(markers) 
-    D_constraints = marker_constraints(G) 
+    print('Computing distances')
+    D0 = euclidean_distances(markers)
+    D = D0
+    print('Markers constraints') 
+    D_constraints = markers_constraints(G) 
+    finite = np.isfinite(D_constraints)
     
-    for k in range(5):
+    for k in range(3):
         print('K=%d ' % k)
-        
-        for i, j in itertools.product(range(n), range(n)):
-            if np.isfinite(D_constraints[i, j]):
-                D[i, j] = D_constraints[i, j]
-                
-        S = mds(D, 2)
+        print('Setting constraints')
+    
+        D2 = np.where(finite, D_constraints, D)
+#                    
+#        for i, j in itertools.product(range(n), range(n)):
+#            if np.isfinite(D_constraints[i, j]):
+#                D[i, j] = D_constraints[i, j]
+#                
+#        assert_allclose(D2, D, atol=1e-8)
+        print('MDS')
+        S = mds_randomized(D2, 2)
+        print('Distances')
         D = euclidean_distances(S)
+    
+        change = np.abs(D - D0).mean()
+        print('Mean change: %f' % change)
         
     poses = markers2poses(S)
     
@@ -374,33 +381,3 @@ def improve(G, G_guess):
         G2.add_node(u, pose=poses[i])
     return G2 
 
-
-#def solve_by_reduction_2(G, scale=1):
-#    n = G.number_of_nodes()
-#    Dall = np.zeros((3 * n, 3 * n))
-#    Srel = np.zeros((3, 3))
-#    Srel[:, 0] = [0, 0, 1] * scale
-#    Srel[:, 1] = [-1, 0.5, 1] * scale
-#    Srel[:, 2] = [-1, -0.5, 1] * scale
-#    
-#    it2node = G.nodes()
-#    for i, j  in itertools.product(range(n), range(n)):
-#        if i == j: continue
-#        pose = G[it2node[i]][it2node[j]]['pose']
-#        Sset = np.zeros((2, 6))
-#        Sset[:, 0:3] = Srel[:2, :]
-#        Sset[:, 3:6] = np.dot(pose, Srel)[:2, :]
-#        Dset = euclidean_distances(Sset)
-#        indices = [i, i + n, i + 2 * n, j, j + n, j + 2 * n]
-#        for u, v in itertools.product(range(6), range(6)):
-#            Dall[indices[u], indices[v]] = Dset[u, v]
-#
-#    Sall = mds(Dall, 2)
-#    # Check that we have the correct orientation
-#    areas = np.array([area(Sall[:, i], Sall[:, i + n], Sall[:, i + 2 * n]) 
-#                        for i in range(n)])
-#    if np.mean(np.sign(areas)) < 0:
-#        # Invert one coordintate to flip orientation
-#        Sall[0, :] = -Sall[0, :]
-#    
-#    G2 = nx.DiGraph() 
