@@ -3,6 +3,7 @@ from contracts import contract
 from geometry import assert_allclose
 import numpy as np
 from efpno.script.performance import constraints_and_observed_distances
+from geometry.poses import translation_angle_from_SE2
 
 def create_report_execution(exc_id,
                            tcid,
@@ -11,31 +12,37 @@ def create_report_execution(exc_id,
     r = Report(exc_id)
      
     f = r.figure('misc') 
-    G = tc.G
-    Dl = results['Dl']
-    Sl = results['Sl']
+#    G = tc.G
+    G_all = results.get('G_all', None)
+    G_landmarks = results.get('G_landmarks', None)
     landmarks = np.array(results['landmarks'], dtype='int32')
-    S = results['S']
-    assert_allclose(G.number_of_nodes(), S.shape[1])
     
-    print('plotting landmark positions')
-    report_add_coordinates_and_edges(r, 'Sl', Sl, G, f, 'landmarks positions') 
-     
+#    Dl = results['Dl']
+#    Sl = results['Sl']
+#    S = results['S']
+#    assert_allclose(G.number_of_nodes(), S.shape[1])
+    
+    if G_landmarks is not None: 
+        print('plotting landmark positions %s' % G_landmarks.number_of_nodes())
+        report_add_coordinates_and_edges(r, 'G_landmarks', G=G_landmarks,
+                                          f=f, caption='landmarks positions')
+    else:
+        print("could not find G_landmarks")
+        
+    if G_all is not None: 
+        print('plotting full solution %s' % G_all.number_of_nodes())
+        report_add_coordinates_and_edges(r, 'G_all', G=G_all,
+                                         landmarks=landmarks,
+                                      f=f, caption='all nodes positions') 
+    else:
+        print("could not find G_all")
 #    report_add_coordinates_and_edges(r, 'S_edges', S, G, f, 'all positions')
     
-    f1 = r.figure('sol1', cols=3)
-    print('plotting S')
-    report_add_solution(r=r, nid='stage1', S=S, G=G, landmarks=landmarks, f=f1)
-    
-    if 'S2' in results:
-        S2 = results['S2']
-        report_add_solution(r=r, nid='stage2', S=S2, G=G, f=f1)
-#    for k in range(4):
-#        var = 'S%d' % k
-#        report_add_solution(r, var, results[var], G, f1)
-
-    
-    r.data('Dl', Dl).display('scale').add_to(f)
+#    f1 = r.figure('sol1', cols=3)
+#    print('plotting S')
+#    report_add_solution(r=r, nid='stage1', S=S, G=G, landmarks=landmarks, f=f1)
+#     
+#    r.data('Dl', Dl).display('scale').add_to(f)
     
     return r
 #
@@ -83,27 +90,37 @@ fs = 6
 #    if f:
 #        r.last().add_to(f, caption)
 
-@contract(S='array[2xN]')
-def report_add_coordinates_and_edges(r, nid, S, G,
+def get_coords(G):
+    n = G.number_of_nodes()
+    coords = np.zeros((2, n))
+    for u in G.nodes():
+        t, angle = translation_angle_from_SE2(G.node[u]['pose'])
+        coords[:, u] = t
+    return coords
+
+def report_add_coordinates_and_edges(r, nid, G,
                                      f=None, caption=None,
                                      plot_edges=False,
                                      landmarks=None):
-    with  r.data_pylab(nid, figsize=(fs, fs)) as pylab:
-        pylab.plot(S[0, :], S[1, :], 'k.')
+    coords = get_coords(G)
+    
+    with r.data_pylab(nid, figsize=(fs, fs)) as pylab:
+        pylab.plot(coords[0, :], coords[1, :], 'k.')
+            
         if landmarks is not None:
-            pylab.plot(S[0, landmarks], S[1, landmarks], 'r.')
+            pylab.plot(coords[0, landmarks], coords[1, landmarks], 'r.')
         
         if plot_edges:
             for u, v in G.edges():
                 d_c = G[u][v]['dist']
-                d_o = np.linalg.norm(S[:, u] - S[:, v])
+                d_o = np.linalg.norm(coords[:, u] - coords[:, v])
                 if d_o < d_c:
                     color = 'r-'
                 else:
                     color = 'b-'
                      
-                pylab.plot([ S[0, u], S[0, v] ],
-                           [ S[1, u], S[1, v] ], color)
+                pylab.plot([ coords[0, u], coords[0, v] ],
+                           [ coords[1, u], coords[1, v] ], color)
             
         pylab.axis('equal')
     if f is not None:

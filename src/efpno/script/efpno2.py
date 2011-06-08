@@ -29,7 +29,7 @@ class Algorithm:
         add_to_main(results, results.get('lgstats', {}), 'landmarks-gstats')
         add_to_main(results, results.get('stats', {}), 'all-relstats')
         
-        print ' %.4f\n'.join(results.keys())
+#        print ' %.4f\n'.join(results.keys())
         return results
     
     def phase(self, name):
@@ -48,7 +48,7 @@ class EFPNO3(Algorithm):
         freq = int(np.ceil(n / nl))
         landmarks = range(0, n, freq)
         nlandmarks = len(landmarks)
-        ndim = 2
+#        ndim = 2
         results = {}  
 
         self.phase('shortest_path')
@@ -59,43 +59,60 @@ class EFPNO3(Algorithm):
         
         print('Using %d landmarks for %d nodes.' % (nlandmarks, n))
         
-        self.phase('computing subgraph')
+        self.phase('compute:computing subgraph')
         landmarks_subgraph = compute_subgraph(G, paths, landmarks)
         
         if lmode == 'euclidean':
             self.phase('solving euclidean')
             G2, Sl, Dl = solve_euclidean(landmarks_subgraph)
             self.phase('computing metric for landmarks')
+            Sl_d = euclidean_distances(Sl)
+            lstats = distances_matrix_metrics(Dl, Sl_d)
+            print(distances_metrics_print('landmark-relstats', lstats))
+            results['lstats'] = lstats
+            S = place_other_nodes(G, paths, landmarks, Sl, nref)
+            results['S'] = S
+        
+            self.phase('computing stats')
+            stats = constraints_and_observed_distances(G, S)
+            print(distances_metrics_print('all-relstats', stats))
+            results['stats'] = stats
+            results['Dl'] = Dl
+            results['Sl'] = Sl
+
         elif lmode == 'reduce':
-            G2, Sl, Dl, Sall, Dall = solve_by_reduction(landmarks_subgraph)
-            lgstats = graph_errors(constraints=landmarks_subgraph, solution=G2)
+        
+            self.phase('compute:solve_by_reduction')
+            G_landmarks = solve_by_reduction(landmarks_subgraph)
+
+            self.phase('compute:placing other nodes')
+            G_all = place_other_nodes_simple(G=G, paths=paths,
+                                             landmarks=landmarks,
+                                             landmarks_solution=G_landmarks)
+            
+            self.phase('stats:computing graph_errors')
+            lgstats = graph_errors(constraints=landmarks_subgraph,
+                                   solution=G_landmarks)
+            gstats = graph_errors(constraints=G, solution=G_all)
+
+            self.phase('debug:printing')
+            
             print(graph_errors_print('landmark-gstats', lgstats))
+            print(graph_errors_print('all-gstats', gstats))
+
+            
+            results['G_all'] = G_all
+            results['G_landmarks'] = G_landmarks
             results['lgstats'] = lgstats
+            results['gstats'] = gstats
+        
         else: raise Exception('unknown lmode %r' % lmode)
         
-        Sl_d = euclidean_distances(Sl)
-        lstats = distances_matrix_metrics(Dl, Sl_d)
     
-        print(distances_metrics_print('landmark-relstats', lstats))
-        
-        self.phase('Putting other nodes')
-        S = place_other_nodes(G, paths, landmarks, Sl, nref)
-       
-        
-        self.phase('computing stats')
-        stats = constraints_and_observed_distances(G, S)
-        print(distances_metrics_print('all-relstats', stats))
-
         self.phase('Done!')
         
-        results['Dl'] = Dl
         results['landmarks'] = landmarks
         results['landmarks_subgraph'] = landmarks_subgraph
-        results['Sl'] = Sl
-        results['S'] = S
-        results['lstats'] = lstats
-#        results['lgstats'] = lgstats
-        results['stats'] = stats
         return results
 
 def extract_distances(G):
@@ -143,8 +160,7 @@ def solve_by_reduction(G, scale=1):
 
     Sall = mds(Dall, 2)
     
-    G2 = nx.DiGraph()
-#    G2 = nx.DiGraph(G)
+    G2 = nx.DiGraph() 
     def area(a, b, c):
         M = np.ones((3, 3))
         M[0, :2] = a
@@ -156,27 +172,23 @@ def solve_by_reduction(G, scale=1):
     for i in range(n):
         areas[i] = area(Sall[:, i], Sall[:, i + n], Sall[:, i + 2 * n])
         
-        #print('Area of %s: %d  %f ' % (i, s, A))
-#    print('Average area: %s' % areas.mean())
     if np.mean(np.sign(areas)) < 0:
-#        print('Seems like the solution is flipped; adjusting.')
+        # print('Seems like the solution is flipped; adjusting.')
         Sall[0, :] = -Sall[0, :]
     else:
         pass
-#        print('Solution has correct orientation.')
+        # print('Solution has correct orientation.')
     
     for i in range(n):
         head = Sall[:, i]
         tail = 0.5 * (Sall[:, i + n] + Sall[:, i + 2 * n])
-        d = np.linalg.norm(head - tail)
-#        print('%d  head-tail: %10.4f' % (i, d))
+        #        d = np.linalg.norm(head - tail)
+        #        print('%d  head-tail: %10.4f' % (i, d))
         theta = direction(tail, head)
         node_pose = SE2_from_translation_angle(head, theta) 
         G2.add_node(i, pose=node_pose)
         
-    S = Sall[:n, :n]
-    D = Dall[:n, :n]
-    return G2, S, D, Dall, Sall
+    return G2
 
 def direction(tail, head):
     v = head - tail
@@ -223,6 +235,24 @@ def place_other_nodes(G, paths, landmarks, Sl, nref):
             distances[r] = SE2_to_distance(diff)
         S[:, i] = place(references, distances)
     return S
+
+def place_other_nodes_simple(G, paths, landmarks, landmarks_solution):
+    nlandmarks = len(landmarks)
+    n = G.number_of_nodes()
+    
+    G2 = nx.DiGraph()
+    
+    for i in range(n):
+        i_to_landmarks = [(l, len(paths[landmarks[l]][i])) 
+                          for l in range(nlandmarks)]
+        l = sorted(i_to_landmarks, key=lambda x:x[1])[0][0]
+        diff = reconstruct(G, paths[landmarks[l]][i])
+        landmark_pose = landmarks_solution.node[l]['pose']
+#        pose = np.dot(landmark_pose, np.linalg.inv(diff))
+        pose = np.dot(landmark_pose, diff)
+        
+        G2.add_node(i, pose=pose)
+    return G2
 
 class EFPNO2(Algorithm):
     def solve(self, G):
