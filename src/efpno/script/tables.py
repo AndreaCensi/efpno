@@ -5,14 +5,18 @@ from reprep import Report
 natsorted = sorted # XXX
 
 entries = """
+all-gstats-errors_t_mean %.4f                                                                                           
+all-gstats-errors_theta_mean_deg %.2fdeg                                                                                   
+all-gstats-errors_t_max %.4f                                                                                            
+all-gstats-errors_theta_max_deg %.4fdeg                                                                                    
+landmarks-gstats-errors_t_mean %.4f                                                                                           
+landmarks-gstats-errors_theta_mean_deg %.2fdeg                                                                                   
+landmarks-gstats-errors_t_max %.4f                                                                                            
+landmarks-gstats-errors_theta_max_deg %.4fdeg                                                                                    
 landmarks-relstats-err_log_max %.4f                                                                                           
 landmarks-relstats-err_log_mean %.4f                                                                                          
 landmarks-relstats-err_flat_max %.4f    
 landmarks-relstats-err_flat_mean %.4f                                                                                              
-landmarks-gstats-errors_t_max %.4f                                                                                            
-landmarks-gstats-errors_t_mean %.4f                                                                                           
-landmarks-gstats-errors_theta_max_deg %.4fdeg                                                                                    
-landmarks-gstats-errors_theta_mean_deg %.2fdeg                                                                                   
 all-relstats-err_log_max %.4f                                                                                                 
 all-relstats-err_log_mean %.4f                                                                                                
 all-relstats-err_flat_max %.4f                                                                                                

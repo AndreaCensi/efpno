@@ -9,10 +9,13 @@ Combination = namedtuple('Combination', 'algorithms test_cases')
 def get_everything():
     
     algorithms = [
-        ('Efast', (EFPNO3, dict(nref=3, nl=48, lmode='euclidean'))),
-        ('EfastR', (EFPNO3, dict(nref=3, nl=48, lmode='reduce'))),
-        ('Eslow', (EFPNO3, dict(nref=3, nl=100, lmode='euclidean'))),
-        ('EslowR', (EFPNO3, dict(nref=3, nl=100, lmode='reduce')))
+#        ('Efast', (EFPNO3, dict(nref=3, nl=48, lmode='euclidean'))),
+        ('EfastR', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False))),
+        ('EfastR', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
+        ('EfastRm', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=True))),
+#        ('Eslow', (EFPNO3, dict(nref=3, nl=100, lmode='euclidean'))),
+        ('EslowR', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=False))),
+        ('EslowRm', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=True)))
 
     ]
     
@@ -23,7 +26,9 @@ def get_everything():
     
     sets = {}
     
-    sets['tmp'] = Combination(['Efast*'], '*')
+    sets['tmp'] = Combination(['E*'], 'intel')
+    sets['tmp'] = Combination(['EfastR', 'EfastRi'], 'intel')
+
     
     sets['all'] = Combination('*', '*')
     

@@ -66,3 +66,16 @@ def reconstruct(G, path):
         edge_pose = edge['pose']
         pose = np.dot(pose, edge_pose)
     return pose
+
+def area(a, b, c):
+    M = np.ones((3, 3))
+    M[0, :2] = a
+    M[1, :2] = b
+    M[2, :2] = c
+    return np.linalg.det(M)
+
+
+def direction(tail, head):
+    v = head - tail
+    return np.arctan2(v[1], v[0])
+
