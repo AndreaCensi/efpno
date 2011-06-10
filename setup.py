@@ -37,12 +37,13 @@ setup(name='efpno',
       
       package_dir={'':'src'},
       packages=find_packages('src'),
-      install_requires=[ ],
+      install_requires=[ 'PyContracts' ],
       tests_require=['nose'],
         entry_points={
          'console_scripts': [
            'efpno_test_parsing_stream = efpno.parsing.parse:main',
-           'efpno_floyd_bench = efpno.script.evaluation_main:main',
+           'efpno_evaluation = efpno.script.evaluation_main:main',
+           'efpno_simplification = efpno.script.graph_simplification_demo:main',
         ]
     }
 

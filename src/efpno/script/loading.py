@@ -17,26 +17,26 @@ class TestCase(object):
 #    def is_euclidean(self):
 #        return self.geometry == 'E'
     
-def load_graph(filename):
+def load_graph(stream, raise_if_unknown=True, progress=True):
     G = DiGraph()
-    raise_if_unknown = True
     count = 0
-    with open(filename) as f:
-        for x in parse(f, raise_if_unknown=raise_if_unknown):
-            if isinstance(x, AddVertex2D):
-                G.add_node(int(x.id))
-                
-            if isinstance(x, AddEdge2D):
-                G.add_edge(int(x.id1), int(x.id2), pose=x.pose, inf=x.inf,
-                            dist=SE2_to_distance(x.pose))
-                G.add_edge(int(x.id2), int(x.id1), pose=SE2.inverse(x.pose), inf=x.inf,
-                           dist=SE2_to_distance(x.pose))
-        
-            if count % 100 == 0:
-                print count
-            count += 1
+    for x in parse(stream, raise_if_unknown=raise_if_unknown):
+        if isinstance(x, AddVertex2D):
+            G.add_node(int(x.id))
+            
+        if isinstance(x, AddEdge2D):
+            G.add_edge(int(x.id1), int(x.id2), pose=x.pose, inf=x.inf,
+                        dist=SE2_to_distance(x.pose))
+            G.add_edge(int(x.id2), int(x.id1), pose=SE2.inverse(x.pose), inf=x.inf,
+                       dist=SE2_to_distance(x.pose))
+    
+        if progress and (count % 100 == 0):
+            print(count)
+        count += 1
     return G
 
 def load_log_tc(filename):
-    tc = TestCase(filename, G=load_graph(filename))
+    with open(filename) as f:
+        G = load_graph(f)
+    tc = TestCase(filename, G=G)
     return tc
