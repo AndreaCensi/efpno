@@ -1,7 +1,6 @@
 import sys
-import numpy as np
-import geometry
-from .structures import AddVertex2D, AddEdge2D, Unknown
+from ..math import np, SE2_from_xytheta
+from . import AddVertex2D, AddEdge2D, Unknown
 
 def parse_line(line):
     # remove ending ';'
@@ -26,7 +25,7 @@ def cmd_vertex2(line):
     id = args[1]
     if len(args) > 2:
         xyt = args[2:5]
-        pose = geometry.SE2_from_xytheta(np.array(xyt))
+        pose = SE2_from_xytheta(np.array(xyt))
     else:
         pose = None
         
@@ -41,7 +40,7 @@ def cmd_edge2(line):
     x = args[3]
     y = args[4]
     th = args[5]
-    pose = geometry.SE2_from_xytheta(np.array([x, y, th]))
+    pose = SE2_from_xytheta(np.array([x, y, th]))
     inf = np.identity(3)
     return AddEdge2D(id1=id1, id2=id2, pose=pose, inf=inf)
 

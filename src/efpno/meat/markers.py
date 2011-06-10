@@ -1,7 +1,5 @@
-from geometry.poses import SE2_from_translation_angle
-from contracts.main import contract
-from efpno.script.utils import direction
-import numpy as np
+from contracts import contract
+from ..math import direction, np, SE2_from_translation_angle
 
 @contract(S='array[2xN]', returns='list(SE2)')
 def markers2poses(S):

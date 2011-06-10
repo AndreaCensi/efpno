@@ -1,22 +1,14 @@
-import networkx as nx #@UnresolvedImport
-import os
-import itertools
-from geometry import mds, place
-from geometry import euclidean_distances
-from compmake import comp, compmake_console, batch_command
-
-from efpno.script.utils import reconstruct, SE2_to_distance
-
-from efpno.script.report import (create_report_tc, create_tables_for_paper,
-                                 create_tables_for_paper,
-                                 create_report_execution)
-
-from .tables import create_report_comb_stats
-
-from networkx import  single_source_shortest_path #@UnresolvedImport
-from optparse import OptionParser, OptionGroup
+import os, itertools
 from contracts import disable_all
-import numpy as np
+from compmake import comp, compmake_console, batch_command
+from optparse import OptionParser, OptionGroup
+
+from ..math import np
+from ..report import (create_report_tc,
+                                 create_tables_for_paper,
+                                 create_report_execution,
+                                 create_report_comb_stats)
+
 from .combinations import get_everything
 from .wildcards import expand_string
 

@@ -1,8 +1,7 @@
 from reprep import Report
-import numpy as np
-from efpno.script.performance import constraints_and_observed_distances, \
-    graph_errors_print
-from geometry.poses import translation_angle_from_SE2
+from ..math import np, translation_angle_from_SE2
+from ..graphs import  graph_errors_print
+
 
 def create_report_execution(exc_id,
                            tcid,
@@ -44,7 +43,9 @@ def create_report_execution(exc_id,
                                       f=f, caption='all nodes positions') 
         report_add_distances_errors_plot(r, nid='gstats', stats=results['gstats'], f=f)
     else:
-        print("could not find G_all") 
+        print("could not find G_all")
+        
+    r.text('phases_as_text', results['phases_as_text']) 
     return r 
 
 def report_add_distances_errors_plot(r, nid, stats, f):

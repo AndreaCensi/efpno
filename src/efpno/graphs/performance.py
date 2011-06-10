@@ -1,7 +1,4 @@
-import numpy as np
-from contracts.main import contract
-from geometry.poses import translation_angle_from_SE2
-from .utils import SE2_to_distance
+from ..math import SE2_to_distance, translation_angle_from_SE2, contract, np
 
 def constraints_and_observed_distances(G, S):
     d_c = []

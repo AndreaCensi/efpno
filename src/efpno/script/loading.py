@@ -1,8 +1,6 @@
-import networkx as nx
-from efpno.parsing.parse import parse
-from efpno.parsing.structures import AddVertex2D, AddEdge2D 
-from .utils import SE2_to_distance, check_proper
-from geometry import SE2 
+from ..parsing import AddVertex2D, AddEdge2D, parse 
+from ..math import SE2_to_distance, SE2
+from ..graphs import DiGraph
 
 EUCLIDEAN2D = 'E2D'
 
@@ -12,15 +10,15 @@ class TestCase(object):
         self.G = G
         self.has_ground_truth = False
         self.geometry = geometry
-        
-    def is_spherical(self):
-        return self.geometry == 'S'
-    
-    def is_euclidean(self):
-        return self.geometry == 'E'
+#        
+#    def is_spherical(self):
+#        return self.geometry == 'S'
+#    
+#    def is_euclidean(self):
+#        return self.geometry == 'E'
     
 def load_graph(filename):
-    G = nx.DiGraph()
+    G = DiGraph()
     raise_if_unknown = True
     count = 0
     with open(filename) as f:
@@ -37,7 +35,6 @@ def load_graph(filename):
             if count % 100 == 0:
                 print count
             count += 1
-    check_proper(G)
     return G
 
 def load_log_tc(filename):

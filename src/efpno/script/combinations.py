@@ -9,14 +9,21 @@ Combination = namedtuple('Combination', 'algorithms test_cases')
 def get_everything():
     
     algorithms = [
-        ('Efast', (EFPNO3, dict(nref=3, nl=50, lmode='euclidean'))),
-        ('EfastR', (EFPNO3, dict(nref=3, nl=50, lmode='reduce', multi=False))),
-#        ('EfastRi', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
-#        ('EfastRm', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=True))),
-#        ('Eslow', (EFPNO3, dict(nref=3, nl=100, lmode='euclidean'))),
-        ('EslowR', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=False))),
-#        ('EslowRm', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=True))),
-        ('EslugR', (EFPNO3, dict(nref=3, nl=150, lmode='reduce', multi=False))),
+#        ('Efast', (EFPNO3, dict(nref=3, nl=50, lmode='euclidean'))),
+        ('E-L10-R1', (EFPNO3, dict(nref=1, nl=10, lmode='reduce'))),
+        ('E-L10-R3', (EFPNO3, dict(nref=3, nl=10, lmode='reduce'))),
+        ('E-L25-R1', (EFPNO3, dict(nref=1, nl=25, lmode='reduce'))),
+        ('E-L25-R3', (EFPNO3, dict(nref=3, nl=25, lmode='reduce'))),
+        ('E-L50-R1', (EFPNO3, dict(nref=1, nl=50, lmode='reduce'))),
+        ('E-L50-R3', (EFPNO3, dict(nref=3, nl=50, lmode='reduce'))),
+#        ('E25R', (EFPNO3, dict(nref=1, nl=25, lmode='reduce', multi=False))),
+#        ('EfastR', (EFPNO3, dict(nref=3, nl=50, lmode='reduce', multi=False))),
+##        ('EfastRi', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
+##        ('EfastRm', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=True))),
+##        ('Eslow', (EFPNO3, dict(nref=3, nl=100, lmode='euclidean'))),
+#        ('EslowR', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=False))),
+##        ('EslowRm', (EFPNO3, dict(nref=3, nl=100, lmode='reduce', multi=True))),
+#        ('EslugR', (EFPNO3, dict(nref=3, nl=150, lmode='reduce', multi=False))),
         
     ]
     
@@ -27,10 +34,10 @@ def get_everything():
     
     sets = {}
     
-    sets['tmp'] = Combination(['E*'], 'intel')
-    sets['tmp2'] = Combination(['EfastR', 'EfastRi'], 'intel')
-
-    sets['tmp3'] = Combination(['EslugR'], 'man3500')
+    sets['intel'] = Combination(['E-L*-R*'], 'intel')
+#    sets['tmp2'] = Combination(['EfastR'], 'intel')
+#
+#    sets['tmp3'] = Combination(['EslugR'], 'man3500')
     
     sets['all'] = Combination('*', '*')
     
