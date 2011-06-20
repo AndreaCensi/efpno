@@ -1,6 +1,7 @@
-from efpno.script.efpno2 import EFPNO3
 from efpno.script.loading import load_log_tc
 from collections import namedtuple
+from efpno.algorithms.simplification import EFPNO_S
+from efpno.algorithms.efpno2 import EFPNO3
 
 Combination = namedtuple('Combination', 'algorithms test_cases')
 
@@ -16,6 +17,8 @@ def get_everything():
         ('E-L25-R3', (EFPNO3, dict(nref=3, nl=25, lmode='reduce'))),
         ('E-L50-R1', (EFPNO3, dict(nref=1, nl=50, lmode='reduce'))),
         ('E-L50-R3', (EFPNO3, dict(nref=3, nl=50, lmode='reduce'))),
+        
+        ('S-D10', (EFPNO_S, dict(max_dist=10)))
 #        ('E25R', (EFPNO3, dict(nref=1, nl=25, lmode='reduce', multi=False))),
 #        ('EfastR', (EFPNO3, dict(nref=3, nl=50, lmode='reduce', multi=False))),
 ##        ('EfastRi', (EFPNO3, dict(nref=3, nl=48, lmode='reduce', multi=False, improve=True))),
@@ -41,4 +44,6 @@ def get_everything():
     
     sets['all'] = Combination('*', '*')
     
+    sets['simp1'] = Combination(['S-*'], 'intel')
+
     return dict(algorithms), dict(logs), sets

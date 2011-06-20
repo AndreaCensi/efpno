@@ -4,6 +4,7 @@ from contracts import disable_all
 from ..math import np
 from ..meat import simplify_graph
 from .loading import load_graph
+from efpno.parsing.write import graph_write
 
 def main():
     parser = OptionParser()
@@ -31,12 +32,17 @@ def main():
         f = open(args[0])
     else:
         f = sys.stdin
+        
+    def eprint(x): sys.stderr.write('%s\n' % x)
+     
     G = load_graph(f, raise_if_unknown=True, progress=True)
 
-    print('Loaded graph with %d nodes, %d edges.' % (G.number_of_nodes(),
+    eprint('Loaded graph with %d nodes, %d edges.' % (G.number_of_nodes(),
                                                      G.number_of_edges()))
 
-    G2 = simplify_graph(G, max_dist=options.max_dist)
+    G2, how_to_reattach = simplify_graph(G, max_dist=options.max_dist, eprint=eprint)
     
-    print('Reduced graph with %d nodes, %d edges.' % (G2.number_of_nodes(),
+    eprint('Reduced graph with %d nodes, %d edges.' % (G2.number_of_nodes(),
                                                      G2.number_of_edges()))
+
+    graph_write(G2, sys.stdout)

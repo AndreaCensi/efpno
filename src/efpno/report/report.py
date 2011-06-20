@@ -68,73 +68,43 @@ def report_add_distances_errors_plot(r, nid, stats, f):
         pylab.ylabel('estimated')
     
     r.last().add_to(f)
-#
-#def report_add_solution(r, nid, S, G, landmarks, f):
-#    print('%s: plotting edges' % nid)
-#    report_add_coordinates_and_edges(r=r, nid='%s_S' % nid,
-#                                     S=S, G=G, landmarks=landmarks, f=f,
-#                                     caption='positions') 
-#    
-#    print('%s: recomputing stats' % nid)
-#    stats = constraints_and_observed_distances(G, S) 
-#
-#    print('%s: plotting stats' % nid)
-#    with r.data_pylab('%s_constrained_vs_estimated' % nid) as pylab:
-#        pylab.plot(stats['d_c'], stats['d_e'], '.')
-#        pylab.xlabel('constrained')
-#        pylab.ylabel('estimated')
-#        pylab.axis('equal')
-#        d = max([stats['d_e'].max(), stats['d_c'].max()])
-#        pylab.axis([0, d, 0, d])
-#        pylab.title('eu: %s  log: %s' % (stats['err_flat_mean'],
-#                                         stats['err_log_mean']))
-#    r.last().add_to(f)
-#    
-#    with r.data_pylab('%s_constrained_vs_estimated_log' % nid) as pylab:
-#        pylab.loglog(stats['d_c'], stats['d_e'], '.')
-#        pylab.xlabel('constrained')
-#        pylab.ylabel('estimated')
-#        pylab.title('log: %s' % (stats['err_log_mean']))
-#
-#    r.last().add_to(f)
-#    
 fs = 9
 
-def get_coords(G):
-    n = G.number_of_nodes()
-    coords = np.zeros((2, n))
-    for u in G.nodes():
-        t, angle = translation_angle_from_SE2(G.node[u]['pose'])
-        coords[:, u] = t
-    return coords
+
+def get_coord(G, x):
+    t, angle = translation_angle_from_SE2(G.node[x]['pose']) #@UnusedVariable
+    return t
 
 def report_add_coordinates_and_edges(r, nid, G,
                                      f=None, caption=None,
-                                     plot_edges=False,
-                                     landmarks=None):
-    coords = get_coords(G)
-    
-    with r.data_pylab(nid, figsize=(fs, fs)) as pylab:
-        style = {}
-        pylab.plot(coords[0, :], coords[1, :], 'k.', **style)
-            
-        if landmarks is not None:
-            pylab.plot(coords[0, landmarks], coords[1, landmarks], 'rx',
-                       **style)
-        
+                                     plot_edges=True,
+                                     plot_vertices=True,
+                                     vertex_style=dict(color='r', alpha=0.5),
+                                     edge_style=dict(color='k', alpha=0.5)):
+
+    with r.data_pylab(nid, figsize=(fs, fs)) as pylab: 
         if plot_edges:
+            xends = []
+            yends = []
             for u, v in G.edges():
-                d_c = G[u][v]['dist']
-                d_o = np.linalg.norm(coords[:, u] - coords[:, v])
-                if d_o < d_c:
-                    color = 'r-'
-                else:
-                    color = 'b-'
-                     
-                pylab.plot([ coords[0, u], coords[0, v] ],
-                           [ coords[1, u], coords[1, v] ], color)
-            
+                c_u = get_coord(G, u)
+                c_v = get_coord(G, v) 
+                xends.extend([c_u[0], c_v[0]])
+                xends.append(None)
+                yends.extend([c_u[1], c_v[1]])
+                yends.append(None)
+            pylab.plot(xends, yends, '-', **edge_style)
+        
+        if plot_vertices:
+            x = []; y = []
+            for u in G.nodes():
+                t = get_coord(G, u)
+                x.append(t[0])
+                y.append(t[1])
+            pylab.plot(x, y, '.', **vertex_style)
+        
         pylab.axis('equal')
+
     if f is not None:
         r.last().add_to(f, caption)
 

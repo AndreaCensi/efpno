@@ -4,7 +4,7 @@ from ..graphs import (
       distances_metrics_print, constraints_and_observed_distances, graph_errors,
     graph_errors_print)
 from ..meat import (
-        compute_subgraph, place_other_nodes, place_other_nodes_multi,
+        compute_fully_connected_subgraph, place_other_nodes, place_other_nodes_multi,
         place_other_nodes_simple, place_other_nodes_mref, solve_euclidean,
         solve_by_reduction, improve_guess)
 
@@ -22,11 +22,9 @@ class EFPNO3(Algorithm):
         freq = int(np.ceil(n / nl))
         landmarks = range(0, n, freq)
         nlandmarks = len(landmarks)
-#        ndim = 2
         results = {}  
 
-#        dijkstra_path(G,source,target, weight = 'weight'):
-        
+
         self.phase('compute:shortest_path')
         paths = {}
         for i, l in enumerate(landmarks):
@@ -36,7 +34,7 @@ class EFPNO3(Algorithm):
         print('Using %d landmarks for %d nodes.' % (nlandmarks, n))
         
         self.phase('compute:computing subgraph')
-        landmarks_subgraph = compute_subgraph(G, paths, landmarks)
+        landmarks_subgraph = compute_fully_connected_subgraph(G, paths, landmarks)
         
         if lmode == 'euclidean':
             self.phase('solving euclidean')

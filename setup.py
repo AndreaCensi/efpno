@@ -44,6 +44,8 @@ setup(name='efpno',
            'efpno_test_parsing_stream = efpno.parsing.parse:main',
            'efpno_evaluation = efpno.script.evaluation_main:main',
            'efpno_simplification = efpno.script.graph_simplification_demo:main',
+           'efpno_pipe = efpno.script.io:main',
+           'efpno_plot = efpno.script.plot:main',
         ]
     }
 

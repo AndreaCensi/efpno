@@ -1,6 +1,7 @@
 from ..parsing import AddVertex2D, AddEdge2D, parse 
 from ..math import SE2_to_distance, SE2
 from ..graphs import DiGraph
+import sys
 
 EUCLIDEAN2D = 'E2D'
 
@@ -22,7 +23,7 @@ def load_graph(stream, raise_if_unknown=True, progress=True):
     count = 0
     for x in parse(stream, raise_if_unknown=raise_if_unknown):
         if isinstance(x, AddVertex2D):
-            G.add_node(int(x.id))
+            G.add_node(int(x.id), pose=x.pose)
             
         if isinstance(x, AddEdge2D):
             G.add_edge(int(x.id1), int(x.id2), pose=x.pose, inf=x.inf,
@@ -31,7 +32,8 @@ def load_graph(stream, raise_if_unknown=True, progress=True):
                        dist=SE2_to_distance(x.pose))
     
         if progress and (count % 100 == 0):
-            print(count)
+            sys.stderr.write('Reading graph: %5d    \r' % count)
+            sys.stderr.flush()
         count += 1
     return G
 

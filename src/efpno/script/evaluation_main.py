@@ -11,6 +11,7 @@ from ..report import (create_report_tc,
 
 from .combinations import get_everything
 from .wildcards import expand_string
+from compmake.storage import use_filesystem
 
     
 def main():
@@ -64,6 +65,14 @@ def main():
     available_algorithms, available_test_cases, available_sets = get_everything()    
     
     which = expand_string(options.set, list(available_sets.keys()))
+
+    if len(which) == 1:    
+        compmake_storage = os.path.join(options.outdir, 'compmake', which[0])
+    else:
+        compmake_storage = os.path.join(options.outdir, 'compmake', 'common_storage')
+    
+    use_filesystem(compmake_storage)
+
 
     print('Staging creation of test cases reports')
     test_cases = {}

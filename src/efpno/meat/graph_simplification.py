@@ -13,8 +13,9 @@ def weight_parallel(w1, w2):
 def weight_series(w1, w2):
     return 1.0 / (1.0 / w1 + 1.0 / w2)
     
-def simplify_graph(G0, max_dist):
-  
+def simplify_graph(G0, max_dist, eprint=None):
+    if eprint is None: eprint = lambda x: None #@UnusedVariable
+    how_to_reattach = []
     G = DiGraph(G0)
     
     assert_well_formed(G)
@@ -29,7 +30,7 @@ def simplify_graph(G0, max_dist):
     nodes_order = [] 
     for d in range(max_degree + 1):
         nodes_with_degree = nodes[np.nonzero(nodes_degree == d)[0]]
-        print('degree %3d: %d nodes' % (d, len(nodes_with_degree)))
+        eprint('degree %3d: %d nodes' % (d, len(nodes_with_degree)))
         nodes_order.extend(nodes_with_degree.tolist())
         
     #print('Visiting in this order: %s' % nodes)
@@ -39,7 +40,7 @@ def simplify_graph(G0, max_dist):
         new_stats = (G.number_of_nodes(), G.number_of_edges())
         if stats:
             old_stats = stats[-1]
-            print('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
+            eprint('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
                   (x, nneighbors,
                    new_stats[0], new_stats[0] - old_stats[0],
                    new_stats[1], new_stats[1] - old_stats[1],))
@@ -54,33 +55,28 @@ def simplify_graph(G0, max_dist):
                      1, 0, 0, 0, 0, 0, 0,
                      3, 0, 0, 0, 0]:
         try_again = []
-        print('------------ %d,  remaining %d' % (max_diff, len(remaining)))
+        eprint('------------ %d,  remaining %d' % (max_diff, len(remaining)))
         for x in remaining:
-            num_neighbors, before, after, dd = degree_diff(G, x)
+            num_neighbors, before, after, dd = degree_diff(G, x) #@UnusedVariable
     #        print('%s: diff %+3d' % (x, dd))
             if dd > max_diff:
                 try_again.append(x)
                 continue
             
-            if possibly_eliminate(G, x, max_dist):
+            reattach = possibly_eliminate(G, x, max_dist) 
+            if reattach:
                 dstats(x, num_neighbors)
+                how_to_reattach.append((x, reattach))
             else:
                 try_again.append(x)
                 
         remaining = try_again
         
-    return G
+    return G, how_to_reattach
 
-    
-#    for x in nodes_order:
-#        num_neighbors, before, after, dd = degree_diff(G, x)
-##        print('%s: diff %+3d' % (x, dd))
-#        if dd > 0:
-#            continue
-#        if possibly_eliminate(G, x, max_dist):
-#            dstats(x, num_neighbors)
 
 def possibly_eliminate(G, x, max_dist):
+    ''' Returns either None, or an array {node -> x_to_node} for reattaching. '''
     neighbors = G.neighbors(x)
     if not s_g_possible_to_eliminate(G, x, max_dist):
         #print('Cannot eliminate %s' % x)
@@ -111,14 +107,40 @@ def possibly_eliminate(G, x, max_dist):
                          pose=final_constraint)
         G.add_edge(v, u, dist=final_dist, weight=final_weight,
                          pose=np.linalg.inv(final_constraint))
-
+    reattach = {}
+    for u in neighbors:
+        reattach[u] = (G[x][u]['pose'], G[x][u]['weight'])
+        
     # later, because the same edge can be used again        
     for u in neighbors:
         G.remove_edge(x, u)
         G.remove_edge(u, x)
     assert not G.neighbors(x)
     G.remove_node(x) 
-    return True
+    assert not G.has_node(x)
+    return reattach
+
+def reattach(G0, how_to_reattach):
+    G = DiGraph(G0)
+    for x, constraints in reversed(how_to_reattach):
+        neighbors = constraints.keys()
+        print('Reattaching %5d (%5d neigh: %s)' % (x, len(neighbors), neighbors))
+        assert not G.has_node(x)
+        for u in neighbors:
+            assert G.has_node(u)
+        poses = []
+        weights = []
+        for u in neighbors:
+            x_to_u, weight = constraints[u]
+            u_to_x = np.linalg.inv(x_to_u)
+            pose_u = G.node[u]['pose']
+            pose_x = np.dot(pose_u, u_to_x)
+            poses.append(pose_x)
+            weights.append(weight)
+        best = pose_average(poses, weights)
+        G.add_node(x, pose=best)
+    return G
+ 
   
 @contract(returns='tuple(SE2, >0)')
 def s_g_node_constraint(G, x, u, v):

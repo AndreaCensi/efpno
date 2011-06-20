@@ -75,6 +75,7 @@ def markers_constraints_sparse(G, scale=1):
     return Dall
 
 def solve_by_reduction(G, scale=1):
+    ''' G: fully connected. '''
     n = G.number_of_nodes()
     print('solve_by_reduction: Markers constraints')
     Dall = markers_constraints(G, scale=scale)
@@ -96,8 +97,14 @@ def solve_by_reduction(G, scale=1):
     return G2
 
 
-def compute_subgraph(G, paths, landmarks, node_ids=None, add_self=False):
+def compute_fully_connected_subgraph(G,
+            paths, landmarks=None, node_ids=None, add_self=False):
+    ''' Creates the fully-connect graph from G.
+        If landmarks is None, it defaults to all nodes. ''' 
     S = DiGraph()
+    if landmarks is None:
+        landmarks = G.nodes()
+        node_ids = landmarks
     nlandmarks = len(landmarks)
     if node_ids is None:
         node_ids = range(nlandmarks)

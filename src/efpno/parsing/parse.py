@@ -47,8 +47,16 @@ def cmd_edge2(line):
 commands = {}
 commands['VERTEX2'] = cmd_vertex2
 commands['VERTEX_SE2'] = cmd_vertex2
+commands['VERTEX_XYT'] = cmd_vertex2
+commands['ADD VERTEX2'] = cmd_vertex2
+commands['ADD VERTEX_SE2'] = cmd_vertex2
+commands['ADD VERTEX_XYT'] = cmd_vertex2
 commands['EDGE2'] = cmd_edge2
 commands['EDGE_SE2'] = cmd_edge2
+commands['EDGE_XYT'] = cmd_edge2
+commands['ADD EDGE2'] = cmd_edge2 # XXX
+commands['ADD EDGE_SE2'] = cmd_edge2
+commands['ADD EDGE_XYT'] = cmd_edge2
 
 #
 #ADD VERTEX_XYT 0;
