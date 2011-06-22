@@ -17,7 +17,8 @@ def assert_well_formed(G):
         - if u->v, then v->u
     '''
     for u, v in G.edges():
-        assert u != v
+        if u == v:
+            raise Exception('Found self-edge for node %s' % u)
         pose1 = G[u][v]['pose']
         pose2 = G[v][u]['pose']
         assert_inverse(pose1, pose2)

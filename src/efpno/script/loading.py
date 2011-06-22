@@ -1,7 +1,7 @@
-from ..parsing import AddVertex2D, AddEdge2D, parse 
-from ..math import SE2_to_distance, SE2
-from ..graphs import DiGraph
 import sys
+import os
+from efpno.parsing.graph_building import load_graph
+from efpno.graphs.checking import assert_well_formed
 
 EUCLIDEAN2D = 'E2D'
 
@@ -10,32 +10,58 @@ class TestCase(object):
         self.tcid = tcid
         self.G = G
         self.has_ground_truth = False
-        self.geometry = geometry
-#        
-#    def is_spherical(self):
-#        return self.geometry == 'S'
-#    
-#    def is_euclidean(self):
-#        return self.geometry == 'E'
     
-def load_graph(stream, raise_if_unknown=True, progress=True):
-    G = DiGraph()
-    count = 0
-    for x in parse(stream, raise_if_unknown=raise_if_unknown):
-        if isinstance(x, AddVertex2D):
-            G.add_node(int(x.id), pose=x.pose)
+
+    
+import cPickle as pickle
+
+def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
+    ''' 
+        If argument is 'stdin' it reads from stdin.
+        It tries to read/write from a cache. 
+        
+        It returns a Graph object.
+        
+        G.graph['name'] is an id for the graph, derived from filename. 
+    '''
+    
+    if filename == 'stdin':  
+        if progress:
+            sys.stderr.write('Reading from stdin.\n')
+        G = load_graph(sys.stdin,
+                       raise_if_unknown=raise_if_unknown,
+                       progress=progress)
+        G.graph['name'] = 'stdin'
+        
+    else:
+        cache_name = os.path.splitext(filename)[0] + '.cache.pickle'
+        if use_cache and os.path.exists(cache_name):
+            if progress:
+                sys.stderr.write('Reading from cache %r.\n' % cache_name)
+            with open(cache_name, 'rb') as f: 
+                return pickle.load(f)
+        
+        if progress:
+            sys.stderr.write('Reading from %r.\n' % filename)
+        
+        with open(filename) as f:
+            G = load_graph(f,
+                           raise_if_unknown=raise_if_unknown,
+                           progress=progress)
             
-        if isinstance(x, AddEdge2D):
-            G.add_edge(int(x.id1), int(x.id2), pose=x.pose, inf=x.inf,
-                        dist=SE2_to_distance(x.pose))
-            G.add_edge(int(x.id2), int(x.id1), pose=SE2.inverse(x.pose), inf=x.inf,
-                       dist=SE2_to_distance(x.pose))
+        name = os.path.splitext(os.path.basename(filename))[0]        
+        G.graph['name'] = name
+        
+        if use_cache:
+            if progress:
+                sys.stderr.write('Writing to cache %r.\n' % cache_name)
+            with open(cache_name, 'wb') as f:
+                pickle.dump(G, f)
     
-        if progress and (count % 100 == 0):
-            sys.stderr.write('Reading graph: %5d    \r' % count)
-            sys.stderr.flush()
-        count += 1
+    assert_well_formed(G)    
     return G
+    
+# TODO: move away
 
 def load_log_tc(filename):
     with open(filename) as f:

@@ -94,7 +94,6 @@ def graph_errors_print(what, d):
           (d['errors_theta_max_deg'], d['errors_theta_mean_deg']))
     return s
 
-    
 
 @contract(D_c='array[NxN](>=0)', D_e='array[NxN](>=0)')
 def distances_matrix_metrics(D_c, D_e):
@@ -105,3 +104,49 @@ def distances_matrix_metrics(D_c, D_e):
         D_c[i, i] = 1
         D_e[i, i] = 1
     return distances_metrics(np.array(D_c.flat), np.array(D_e.flat)) 
+
+
+
+
+def graph_degree_stats(G):
+    nodes = G.nodes()
+    nodes_degree = np.array([len(G.neighbors(n)) for n in nodes], dtype='int32')
+    max_degree = max(nodes_degree)
+    
+    stats = ""
+    if 'name' in G.graph:
+        stats += 'Graph name: %r  \n\n' % G.graph['name'] 
+    stats += "Number of nodes: %s  \n\n" % G.number_of_nodes() 
+    stats += "Number of edges: %s  \n\n" % G.number_of_edges()
+    
+    stats += "\nNode degrees ::\n\n"
+    for d in range(max_degree + 1):
+        num = (nodes_degree == d).sum()
+        stats += ('    degree %3d: %6d nodes  \n' % (d, num))
+    
+    return stats     
+
+
+def graph_degree_stats_compact(G):
+    nodes = G.nodes()
+    nodes_degree = np.array([len(G.neighbors(n)) for n in nodes], dtype='int32')
+    max_degree = max(nodes_degree)
+    
+    stats = ""
+    if 'name' in G.graph:
+        stats += 'Graph name: %r  ' % G.graph['name'] 
+    stats += "  nodes: %s " % G.number_of_nodes() 
+    stats += "  edges: %s\n" % G.number_of_edges()
+    
+    num = "     #:  "
+    deg = "degree:  "
+    
+    for d in range(min(max_degree + 1, 16)):
+        deg += "%7d" % d
+        n = (nodes_degree == d).sum()
+        num += "%7d" % n
+    stats += deg + '\n' + num + '\n'
+    
+        
+    return stats     
+

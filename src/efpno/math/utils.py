@@ -11,7 +11,12 @@ def direction(tail, head):
     v = head - tail
     return np.arctan2(v[1], v[0])
 
-def SE2_to_distance(g): # TODO: make more efficient
+def SE2_to_distance(g):
+    x = g[0, 2]
+    y = g[1, 2]
+    return np.sqrt(x * x + y * y)
+
+def SE2_to_distance_slow(g):
     t = translation_angle_from_SE2(g)[0]
     return np.linalg.norm(t)
 
