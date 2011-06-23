@@ -33,8 +33,8 @@ for log in $logs; do
 	
 	for dist in $dists; do
 		mkdir -p $out/solved/
-		solved=$out/solved/$log-solved$dist-200.g2o
-		efpno_solve $fast --seed 0 --max_dist=$dist $source > $solved
+		solved=$out/solved/$log-solved$dist-200-s1m.g2o
+		efpno_solve $fast --seed 0 --scale 1000000 --max_dist=$dist $source > $solved
 		efpno_plot $fast --stats --outdir $out/reports $solved
 	done
 done

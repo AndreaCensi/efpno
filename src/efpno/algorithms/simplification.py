@@ -9,7 +9,8 @@ class EFPNO_S(Algorithm):
     
     def solve(self, G):
         max_dist = self.params['max_dist']       
-        min_nodes = self.params['min_nodes']       
+        min_nodes = self.params['min_nodes']
+        scale = self.params['scale']       
         results = {}  
 
         self.info('Loaded graph with %d nodes, %d edges.' % (G.number_of_nodes(),
@@ -32,11 +33,10 @@ class EFPNO_S(Algorithm):
             compute_fully_connected_subgraph(landmarks_subgraph, paths=subpaths) 
 
         self.phase('compute:solve_by_reduction')
-        G_landmarks = solve_by_reduction(landmarks_subgraph_full, scale=1,
+        G_landmarks = solve_by_reduction(landmarks_subgraph_full, scale=scale,
                                          eprint=self.info)
 
         self.phase('compute:placing other nodes')
-        self.info('G_landmarks: %s' % G_landmarks.nodes())
         G_all = reattach(G_landmarks, how_to_reattach)
             
         
@@ -66,7 +66,7 @@ class EFPNO_S(Algorithm):
         results['solution'] = solution
         results['gstats'] = gstats
     
-        self.phase('Done!')
+        self.phase(None)
         
         results['landmarks'] = landmarks_subgraph.nodes() 
         results['landmarks_subgraph'] = landmarks_subgraph
