@@ -43,15 +43,17 @@ def markers_constraints(G, scale=1):
     Dall = np.ones((3 * n, 3 * n)) * np.inf
     it2node = G.nodes()
     node2it = dict([(node, it) for it, node in enumerate(it2node) ])
+    eye = SE2.unity()
     for u, v in G.edges():
         i = node2it[u]
         j = node2it[v]        
         pose = G[u][v]['pose']
-        markers = poses2markers([ SE2.unity(), pose], scale=scale)
+        markers = poses2markers([ eye, pose], scale=scale)
         Dset = euclidean_distances(markers)
         indices = [i, j, i + n, j + n, i + 2 * n, j + 2 * n]
-        for r, s in itertools.product(range(6), range(6)):
-            Dall[indices[r], indices[s]] = Dset[r, s]
+        for r in range(6):
+            for s in range(6):
+                Dall[indices[r], indices[s]] = Dset[r, s]
     return Dall
 
 def markers_constraints_sparse(G, scale=1):

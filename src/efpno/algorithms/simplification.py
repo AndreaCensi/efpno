@@ -9,6 +9,7 @@ class EFPNO_S(Algorithm):
     
     def solve(self, G):
         max_dist = self.params['max_dist']       
+        min_nodes = self.params['min_nodes']       
         results = {}  
 
         self.info('Loaded graph with %d nodes, %d edges.' % (G.number_of_nodes(),
@@ -17,7 +18,7 @@ class EFPNO_S(Algorithm):
         self.phase('compute:simplification')
         landmarks_subgraph, how_to_reattach = \
             simplify_graph_aggressive(G, max_dist=max_dist,
-                                      eprint=self.info, min_nodes=200)
+                                      eprint=self.info, min_nodes=min_nodes)
     
         self.info('Reduced graph with %d nodes, %d edges.' % 
               (landmarks_subgraph.number_of_nodes(),

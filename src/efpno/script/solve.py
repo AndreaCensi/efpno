@@ -23,6 +23,8 @@ def main():
 
     parser.add_option("--max_dist", default=10, type='float',
                       help='[= %default] Maximum distance for graph simplification.')
+    parser.add_option("--min_nodes", default=250, type='float',
+                      help='[= %default] Minimum number of nodes to simplify to.')
 
     parser.add_option("--seed", default=None, type='int',
                       help='[= %default] Seed for random number generator.')
@@ -41,7 +43,8 @@ def main():
     G = smart_load(filename, raise_if_unknown=True, progress=True)
 
     algorithm = EFPNO_S
-    params = dict(max_dist=options.max_dist)
+    params = dict(max_dist=options.max_dist,
+                  min_nodes=options.min_nodes)
     
     instance = algorithm(params)
     results = instance.solve(G)
