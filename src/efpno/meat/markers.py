@@ -18,9 +18,9 @@ def markers2poses(S):
 @contract(poses='list[N](SE2)', returns='array[2x(3*N)]')
 def poses2markers(poses, scale=1):
     Srel = np.zeros((3, 3))
-    Srel[:, 0] = np.array([0, 0, 1])  
-    Srel[:, 1] = np.array([-scale, +0.5 * scale, 1])
-    Srel[:, 2] = np.array([-scale, -0.5 * scale, 1])
+    Srel[:, 0] = [0, 0, 1]
+    Srel[:, 1] = [-scale, +0.5 * scale, 1]
+    Srel[:, 2] = [-scale, -0.5 * scale, 1]
     N = len(poses)
     S = np.zeros((2, 3 * N))
     for i, pose in enumerate(poses):

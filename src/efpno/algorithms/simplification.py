@@ -17,7 +17,7 @@ class EFPNO_S(Algorithm):
         self.phase('compute:simplification')
         landmarks_subgraph, how_to_reattach = \
             simplify_graph_aggressive(G, max_dist=max_dist,
-                                      eprint=self.info)
+                                      eprint=self.info, min_nodes=200)
     
         self.info('Reduced graph with %d nodes, %d edges.' % 
               (landmarks_subgraph.number_of_nodes(),

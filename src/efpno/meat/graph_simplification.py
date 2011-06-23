@@ -78,7 +78,7 @@ def weight_series(w1, w2):
 #        
 #    return G, how_to_reattach
 
-def simplify_graph_aggressive(G0, max_dist, eprint=None):
+def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
     if eprint is None: eprint = lambda x: None #@UnusedVariable
     how_to_reattach = []
     G = DiGraph(G0)
@@ -122,7 +122,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
     eprint('Elim degree 2:\n%s' % graph_degree_stats_compact(G))
   
     current_max_diff = 0
-    while True:
+    while len(remaining) > min_nodes:
         try_again = []
         eprint('------------ max_diff %d,  remaining %6d nodes, %6d edges ' % 
                 (current_max_diff, len(remaining), G.number_of_edges()))
@@ -218,9 +218,15 @@ def possibly_eliminate(G, x, max_dist):
     neighbors = G.neighbors(x)
 
     reduce = neighbors
-#    if False and len(neighbors) > 6:
-#        cliques = neighbors_cliques(G, x)
-#        reduce = [list(m)[0] for m in cliques]
+    max_neighbors = 8
+    if True and len(neighbors) > max_neighbors:
+        cliques = neighbors_cliques(G, x)
+        reduce = [list(m)[0] for m in cliques]
+        
+        remaining = list(neighbors)
+        for r in reduce: remaining.remove(r)
+        while len(reduce) < max_neighbors:
+            reduce.append(remaining.pop(np.random.randint(len(remaining) - 1)))
     
     if len(reduce) > 1:
         for u, v in itertools.product(reduce, reduce):
