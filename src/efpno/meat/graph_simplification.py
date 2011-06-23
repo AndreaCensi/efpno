@@ -100,8 +100,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
         nodes_with_degree = nodes[np.nonzero(nodes_degree == d)[0]]
         eprint('degree %3d: %d nodes' % (d, len(nodes_with_degree)))
         nodes_order.extend(nodes_with_degree.tolist())
-        
-    #print('Visiting in this order: %s' % nodes)
+         
     stats = []
     def dstats(x, nneighbors):
         global old_stats
@@ -140,9 +139,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
                     num_cannot_be_changed += 1    
                     try_again.append(x)
                     continue
-            
-    #        print('%s: diff %+3d' % (x, dd))
-            
+             
             if dd > current_max_diff:
                 lowest_diff_remaining = min(lowest_diff_remaining, dd)
                 try_again.append(x)
@@ -173,8 +170,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
             if num_cannot_be_changed == len(try_again):
                 break
             eprint(' lowest diff is %d' % lowest_diff_remaining)
-            current_max_diff = lowest_diff_remaining * 1
-            #current_max_diff += 1
+            current_max_diff = lowest_diff_remaining * 1 
         
     return G, how_to_reattach
 
@@ -191,24 +187,23 @@ def remove_degree2(G, degree, remaining, how_to_reattach):
             how_to_reattach.append((x, reattach))
     return try_again
 
-def eliminate_links(G, x, u, v):
-    #print('x=%s  u=%s v=%s' % (x, u, v))
+def eliminate_links(G, x, u, v): 
     new_constraint, new_weight = s_g_node_constraint(G, x, u, v)
     
     if G.has_edge(u, v):
         old_constraint = G[u][v]['pose']
         old_weight = G[u][v]['weight']
+        weights = np.array([old_weight, new_weight])
+        weights = weights / np.sum(weights)
         final_constraint = pose_average(
                                poses=[old_constraint, new_constraint],
-                               weights=[old_weight, new_weight])
-        final_weight = weight_parallel(old_weight, new_weight)
-        # print('  %s --> %s is improved to weight %g' % (u, v, final_weight))
+                               weights=weights)
+        final_weight = weight_parallel(old_weight, new_weight) 
     else:
         final_constraint = new_constraint
         final_weight = new_weight
         G.add_edge(u, v)
-        G.add_edge(v, u)
-        # print('  %s --> %s is created at weight %g' % (u, v, final_weight))
+        G.add_edge(v, u) 
     final_dist = SE2_to_distance(final_constraint)
     G.add_edge(u, v, dist=final_dist, weight=final_weight,
                      pose=final_constraint)
@@ -223,13 +218,9 @@ def possibly_eliminate(G, x, max_dist):
     neighbors = G.neighbors(x)
 
     reduce = neighbors
-    
-#    num_neighbors, before, after, dd = degree_diff(G, x) #@UnusedVariable
-
-#    if True and len(neighbors) > 4:
-    if True and len(neighbors) > 6:
-        cliques = neighbors_cliques(G, x)
-        reduce = [list(m)[0] for m in cliques]
+#    if False and len(neighbors) > 6:
+#        cliques = neighbors_cliques(G, x)
+#        reduce = [list(m)[0] for m in cliques]
     
     if len(reduce) > 1:
         for u, v in itertools.product(reduce, reduce):
@@ -266,6 +257,8 @@ def reattach(G0, how_to_reattach):
             pose_x = np.dot(pose_u, u_to_x)
             poses.append(pose_x)
             weights.append(weight)
+        weights = np.array(weights)
+        weights = weights / np.sum(weights)
         best = pose_average(poses, weights)
         G.add_node(x, pose=best)
     return G

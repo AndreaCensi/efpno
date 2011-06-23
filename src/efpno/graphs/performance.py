@@ -41,7 +41,7 @@ def graph_errors(constraints, solution):
     errors_t = []
     errors_theta = []
     if not constraints.edges():
-        raise Exception('Empty edges in constraints graph.')
+        raise Exception('No edges in constraints graph.')
     
     d_c = []
     d_e = []

@@ -4,9 +4,11 @@ from efpno.parsing.write import graph_write
 from optparse import OptionParser
 import os
 from reprep import Report
-from efpno.report.report import report_add_coordinates_and_edges
+from efpno.report.report import report_add_coordinates_and_edges, \
+    report_add_distances_errors_plot
 from contracts.enabling import disable_all
-from efpno.graphs.performance import graph_degree_stats
+from efpno.graphs.performance import graph_degree_stats, graph_errors, \
+    graph_errors_print
 
 usage = """
 
@@ -24,7 +26,9 @@ def main():
     parser.add_option("--fast", default=False, action='store_true',
                       help='Disables sanity checks.')
     
-
+    parser.add_option("--stats", default=False, action='store_true',
+                      help='Computes statistics.')
+    
     (options, args) = parser.parse_args() #@UnusedVariable
     
     if options.fast:
@@ -37,7 +41,7 @@ def main():
     G = smart_load(filename, raise_if_unknown=True, progress=True)
 
     print('Creating report...')
-    r = create_report(G)
+    r = create_report(G, options.stats)
     
     rd = os.path.join(options.outdir, 'images')
     out = os.path.join(options.outdir, '%s.html' % G.graph['name'])
@@ -45,9 +49,9 @@ def main():
     r.to_html(out, resources_dir=rd)
     
     
-def create_report(G):
+def create_report(G, constraint_stats=False):
     r = Report(G.graph['name'])
-    f = r.figure()
+    f = r.figure("Graph plots")
     
     report_add_coordinates_and_edges(r, 'graph', G, f,
                                      plot_edges=True, plot_vertices=True)
@@ -56,7 +60,19 @@ def create_report(G):
     report_add_coordinates_and_edges(r, 'graph-vertices', G, f,
                                      plot_edges=False, plot_vertices=True)
     
-    r.text('stats', graph_degree_stats(G))
+    
+    r.text('node_statistics', graph_degree_stats(G))
+
+    if constraint_stats:
+        f = r.figure("Constraints statistics")
+        print('Creating statistics')
+        stats = graph_errors(G, G)
+        print(' (done)')
+        report_add_distances_errors_plot(r, nid='statistics', stats=stats, f=f)
+
+        r.text('constraints_stats',
+                graph_errors_print('constraints', stats))
+
     return r
 
 

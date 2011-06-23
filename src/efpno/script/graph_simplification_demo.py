@@ -19,8 +19,8 @@ def main():
     parser.add_option("--seed", default=None, type='int',
                       help='[= %default] Seed for random number generator.')
     
-    parser.add_option("--max_dist", default=1, type='float',
-                      help='[= %default] Seed for random number generator.')
+    parser.add_option("--max_dist", default=10, type='float',
+                      help='[= %default] Maximum distance for graph simplification.')
 
     (options, args) = parser.parse_args() #@UnusedVariable
     

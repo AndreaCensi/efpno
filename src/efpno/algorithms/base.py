@@ -1,4 +1,5 @@
 import time
+import sys
 
 class Algorithm:
     def __init__(self, params):
@@ -33,7 +34,8 @@ class Algorithm:
             
         self.current_phase = (name, time.clock())
         
-        print(name)
+        if name is not None:
+            self.info('Phase %s' % name)
     
     @staticmethod
     def get_phase_desc(phases):
@@ -43,10 +45,16 @@ class Algorithm:
         return s
         
     def print_phase_details(self):
-        print('Benchmarks:')
-        print Algorithm.get_phase_desc(self.phases)
+        self.info('Benchmarks:')
+        self.info(Algorithm.get_phase_desc(self.phases))
             
     def progress(self, what, i, n):
         if i % 20 == 0:
-            print('%s: %5d/%d' % (what, i, n))
+            self.info('%s: %5d/%d' % (what, i, n))
  
+    def info(self, s):
+        # TODO: logger
+        sys.stderr.write(s)
+        sys.stderr.write('\n')
+        
+        

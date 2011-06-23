@@ -74,26 +74,34 @@ def markers_constraints_sparse(G, scale=1):
             Dall[indices[r]][indices[s]] = Dset[r, s]
     return Dall
 
-def solve_by_reduction(G, scale=1):
+def solve_by_reduction(G, scale=1, eprint=None):
     ''' G: fully connected. '''
+    if eprint is None: eprint = lambda x: None #@UnusedVariable
+    
     n = G.number_of_nodes()
-    print('solve_by_reduction: Markers constraints')
+    eprint('solve_by_reduction: Markers constraints')
     Dall = markers_constraints(G, scale=scale)
-    print('solve_by_reduction: MDS')
+    eprint('solve_by_reduction: MDS')
     Sall = mds(Dall, 2)
     # Check that we have the correct orientation
     areas = np.array([area(Sall[:, i], Sall[:, i + n], Sall[:, i + 2 * n]) 
                         for i in range(n)])
     if np.mean(np.sign(areas)) < 0:
-        # Invert one coordintate to flip orientation
+        # Invert one coordinate to flip orientation
         Sall[0, :] = -Sall[0, :]
     
     G2 = DiGraph() 
-    print('solve_by_reduction: marker to pose')
+    eprint('solve_by_reduction: marker to pose')
     poses = markers2poses(Sall)
     it2node = G.nodes()
     for i, pose in enumerate(poses):
         G2.add_node(it2node[i], pose=pose)
+        
+    # add constraints
+    for u, v in G.edges():
+        G2.add_edge(u, v)
+        G2[u][v] = G[u][v]    
+    
     return G2
 
 

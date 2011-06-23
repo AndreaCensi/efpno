@@ -1,6 +1,6 @@
 import contracts
 from efpno.graphs import grid_graph, assert_exact
-from efpno.meat import simplify_graph
+from efpno.meat import simplify_graph_aggressive
 
 def graph_simplification_test():
     contracts.disable_all()
@@ -12,7 +12,7 @@ def graph_simplification_test():
     print('Checking random network')
     assert_exact(G1)
     # todo: remove some edges
-    G2 = simplify_graph(G1, max_dist=20)
+    G2, reattach = simplify_graph_aggressive(G1, max_dist=20)
     
     assert_exact(G2)
     print 'before: ', G1.nodes()

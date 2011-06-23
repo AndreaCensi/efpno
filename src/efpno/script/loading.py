@@ -17,8 +17,9 @@ import cPickle as pickle
 
 def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
     ''' 
-        If argument is 'stdin' it reads from stdin.
-        It tries to read/write from a cache. 
+        If filename is 'stdin' it reads from stdin.
+        
+        If use_cache is True, it tries to read/write from a cache. 
         
         It returns a Graph object.
         
@@ -35,7 +36,8 @@ def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
         
     else:
         cache_name = os.path.splitext(filename)[0] + '.cache.pickle'
-        if use_cache and os.path.exists(cache_name):
+        if (use_cache and os.path.exists(cache_name) and
+                    os.path.getmtime(cache_name) > os.path.getmtime(filename)):
             if progress:
                 sys.stderr.write('Reading from cache %r.\n' % cache_name)
             with open(cache_name, 'rb') as f: 
@@ -58,6 +60,13 @@ def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
             with open(cache_name, 'wb') as f:
                 pickle.dump(G, f)
     
+    if G.number_of_nodes() == 0:
+        raise Exception('Loaded graph with 0 nodes.')
+    
+    if G.number_of_edges() == 0:
+        raise Exception('Loaded graph with 0 edges (%d nodes).' % 
+                        G.number_of_nodes())
+
     assert_well_formed(G)    
     return G
     

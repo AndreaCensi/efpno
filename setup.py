@@ -46,6 +46,8 @@ setup(name='efpno',
            'efpno_simplification = efpno.script.graph_simplification_demo:main',
            'efpno_pipe = efpno.script.io:main',
            'efpno_plot = efpno.script.plot:main',
+           'efpno_solve = efpno.script.solve:main',
+           'efpno_tc_grid = efpno.graphs.grid:main',
         ]
     }
 
