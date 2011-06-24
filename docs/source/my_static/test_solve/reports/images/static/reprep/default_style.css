@@ -1,0 +1,45 @@
+
+body { font-family: Verdana, Tahoma; }
+
+img { border: solid 1px black;}
+h { font-family: monospace; font-size: 120%; color: black; font-weight: bold;  display: block;}
+
+sssection { border: solid 2px gray; display: block; clear: both; padding: 1em; margin: 1em;}
+
+.report-node { display: block; border: solid 2px gray; padding: 0.2em; margin: 0.2em}
+.report-figure { display: block; border: solid 2px green; padding: 0.2em; margin: 0.2em}
+.report-figure-caption { display: block; clear: both;  }
+.report-subfigure {  padding: 5px; padding-bottom: 0; margin: 5px; display: block;}
+.report-subfigure-caption { clear: both; display: block; font-weight: bold; text-align: center;  }
+
+.node-class { margin:1em; float: right; font-family: monospace; color: blue;}
+.node-id {margin:1em;  float: right; font-family: monospace; font-weight: bold; color: green;}
+.datanode { font-family: monospace; font-weight: bold; }
+.datanode-children { margin-left: 0.2em; }
+
+.report-table td {
+    padding: 5px;
+    text-align: right;
+}
+.report-table tr th {
+    padding-left: 2em;
+}
+
+.report-table tr.even {
+    background-color: #EEF;
+}
+
+.report-table caption {
+    font-size: 150%;
+
+}
+.report-table {
+    margin-top: 1em;
+    padding: 1em;
+    border: solid 2px gray;
+}
+
+p.reprep-credits {
+	font-size: 90%; 
+	font-weight: bold;
+}
