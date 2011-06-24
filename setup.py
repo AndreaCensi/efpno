@@ -37,7 +37,7 @@ setup(name='efpno',
       
       package_dir={'':'src'},
       packages=find_packages('src'),
-      install_requires=[ 'PyContracts' ],
+      install_requires=[ 'PyContracts', 'PyGeometry','networkx', 'RepRep' ],
       tests_require=['nose'],
         entry_points={
          'console_scripts': [
