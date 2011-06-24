@@ -1,17 +1,15 @@
-import os, itertools
+import itertools
+import os
+
+from compmake import comp, compmake_console, batch_command, use_filesystem
 from contracts import disable_all
-from compmake import comp, compmake_console, batch_command
 from optparse import OptionParser, OptionGroup
 
 from ..math import np
-from ..report import (create_report_tc,
-                                 create_tables_for_paper,
-                                 create_report_execution,
-                                 create_report_comb_stats)
-
+from ..report import (create_report_tc, create_tables_for_paper,
+    create_report_execution, create_report_comb_stats)
 from .combinations import get_everything
 from .wildcards import expand_string
-from compmake.storage import use_filesystem
 
     
 def main():

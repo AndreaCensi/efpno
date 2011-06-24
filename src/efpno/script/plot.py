@@ -23,15 +23,15 @@ def main():
 
     parser.add_option("--outdir", default='.')
     
-    parser.add_option("--fast", default=False, action='store_true',
-                      help='Disables sanity checks.')
+    parser.add_option("--slow", default=False, action='store_true',
+                      help='Enables sanity checks.')
     
     parser.add_option("--stats", default=False, action='store_true',
                       help='Computes statistics.')
     
     (options, args) = parser.parse_args() #@UnusedVariable
     
-    if options.fast:
+    if not options.slow:
         disable_all()
     
     if len(args) > 1:

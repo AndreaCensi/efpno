@@ -39,9 +39,11 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
          
     remaining = nodes_order
     
-    eprint('In this phase, we remove ') # TODO:
+    eprint('First remove the nodes with degree 2') # TODO:
     # first remove every node with degree 2 
-    remaining = remove_degree2(G, 2, remaining, how_to_reattach)
+    remaining = s_g_remove_degree2(G, 2, remaining, how_to_reattach)
+    eprint('Remaining with %d nodes. Now iterating on the others.' % 
+           len(remaining))
     
     current_max_diff = 0
     num_iteration = 0
@@ -61,26 +63,20 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
         for x in remaining:
             num_neighbors, before, after, dd = degree_diff(G, x) #@UnusedVariable
             
-            if current_max_diff > 1:
-                if not s_g_possible_to_eliminate(G, x, max_dist):
-                    num_cannot_be_changed += 1    
-                    try_again.append(x)
-                    continue
-             
             if dd > current_max_diff:
                 lowest_diff_remaining = min(lowest_diff_remaining, dd)
                 try_again.append(x)
                 continue
             
-            reattach = possibly_eliminate(G, x, max_dist) 
-            if reattach: 
+            if s_g_possible_to_eliminate(G, x, max_dist):
+                reattach = s_g_eliminate_node(G, x) 
                 how_to_reattach.append((x, reattach))
                 num_changes += 1
             else:
                 num_cannot_be_changed += 1
                 try_again.append(x)
                 
-            if len(remaining) <= min_nodes: break
+            if len(remaining) - num_changes <= min_nodes: break
                 
         remaining = try_again
     
@@ -110,7 +106,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
 
     return G, how_to_reattach
 
-def remove_degree2(G, degree, remaining, how_to_reattach):
+def s_g_remove_degree2(G, degree, remaining, how_to_reattach):
     try_again = []
     for x in remaining:
         num_neighbors, before, after, dd = degree_diff(G, x) #@UnusedVariable
@@ -118,12 +114,11 @@ def remove_degree2(G, degree, remaining, how_to_reattach):
             try_again.append(x)
             continue
         
-        reattach = possibly_eliminate(G, x, max_dist=100000) 
-        if reattach:
-            how_to_reattach.append((x, reattach))
+        reattach = s_g_eliminate_node(G, x)
+        how_to_reattach.append((x, reattach))
     return try_again
 
-def eliminate_links(G, x, u, v): 
+def s_g_eliminate_links(G, x, u, v): 
     new_constraint, new_weight = s_g_node_constraint(G, x, u, v)
     
     if G.has_edge(u, v):
@@ -146,10 +141,8 @@ def eliminate_links(G, x, u, v):
     G.add_edge(v, u, dist=final_dist, weight=final_weight,
                      pose=np.linalg.inv(final_constraint))
     
-def possibly_eliminate(G, x, max_dist):
-    ''' Returns either None, or an array {node -> x_to_node} for reattaching. '''
-    if not s_g_possible_to_eliminate(G, x, max_dist):
-        return False
+def s_g_eliminate_node(G, x):
+    ''' Returns an array {node -> x_to_node} for reattaching. '''
 
     neighbors = G.neighbors(x)
 
@@ -167,7 +160,7 @@ def possibly_eliminate(G, x, max_dist):
     if len(reduce) > 1:
         for u, v in itertools.product(reduce, reduce):
             if u <= v: continue # make more elegant
-            eliminate_links(G, x, u, v)
+            s_g_eliminate_links(G, x, u, v)
         
     reattach = {}
     for u in neighbors:
@@ -206,12 +199,8 @@ def reattach(G0, how_to_reattach):
     return G
  
   
-@contract(returns='tuple(SE2, >0)')
 def s_g_node_constraint(G, x, u, v):
-    #assert G.has_edge(x, u), '%s not connected to %s' % (x, u)
-    #assert G.has_edge(u, x), '%s not connected to %s' % (u, x)
-    #assert G.has_edge(x, v), '%s not connected to %s' % (x, v)
-    #assert G.has_edge(v, x), '%s not connected to %s' % (v, x)
+    ''' returns a tuple (pose, weight) '''
     u_to_x = G[u][x]['pose']
     x_to_v = G[x][v]['pose']
     u_to_v = np.dot(u_to_x, x_to_v)

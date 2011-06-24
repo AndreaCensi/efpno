@@ -1,13 +1,11 @@
-import sys, numpy as np
-from efpno.parsing.parse import parse_command_stream
+from efpno.algorithms import EFPNO_S
 from efpno.graphs import DiGraph
-from efpno.parsing.structures import AddEdge2D, AddVertex2D, Equiv, SolveState, \
-    QueryState
-from efpno.parsing.graph_building import graph_apply_operation
-import contracts
-from geometry.poses import translation_angle_from_SE2
+from efpno.parsing import AddEdge2D, AddVertex2D, Equiv, SolveState, QueryState, \
+    graph_apply_operation, parse_command_stream
+from geometry import translation_angle_from_SE2
 from optparse import OptionParser
-from efpno.algorithms.simplification import EFPNO_S
+import numpy as np
+import sys
 
 def eprint(x):
     sys.stderr.write(x)
@@ -17,6 +15,9 @@ def eprint(x):
 def main():
     usage = """Implements the interface of the SLAM evaluation utilities"""
     parser = OptionParser(usage=usage)
+
+    parser.add_option("--slow", default=False, action='store_true',
+                      help='Enables sanity checks.')
 
     parser.add_option("--max_dist", default=15, type='float',
                       help='[= %default] Maximum distance for graph simplification.')
@@ -30,7 +31,8 @@ def main():
     
     (options, args) = parser.parse_args() #@UnusedVariable
     np.random.seed(options.seed)
-    contracts.disable_all()
+    
+#    if not options.slow: contracts.disable_all()
     
     fin = sys.stdin
     fout = sys.stdout
