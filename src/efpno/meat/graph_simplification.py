@@ -15,70 +15,9 @@ def weight_parallel(w1, w2):
 
 def weight_series(w1, w2):
     return 1.0 / (1.0 / w1 + 1.0 / w2)
-#    
-#def simplify_graph(G0, max_dist, eprint=None):
-#    if eprint is None: eprint = lambda x: None #@UnusedVariable
-#    how_to_reattach = []
-#    G = DiGraph(G0)
-#    
-#    assert_well_formed(G)
-#    
-#    for u, v in G.edges():
-#        G[u][v]['weight'] = 1.0
-#    
-#    nodes = np.array(randomly_permute(G.nodes()))
-#    nodes_degree = np.array([len(G.neighbors(n)) for n in nodes])
-#    max_degree = max(nodes_degree)
-#    
-#    nodes_order = [] 
-#    for d in range(max_degree + 1):
-#        nodes_with_degree = nodes[np.nonzero(nodes_degree == d)[0]]
-#        eprint('degree %3d: %d nodes' % (d, len(nodes_with_degree)))
-#        nodes_order.extend(nodes_with_degree.tolist())
-#        
-#    #print('Visiting in this order: %s' % nodes)
-#    stats = []
-#    def dstats(x, nneighbors):
-#        global old_stats
-#        new_stats = (G.number_of_nodes(), G.number_of_edges())
-#        if stats:
-#            old_stats = stats[-1]
-#            eprint('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
-#                  (x, nneighbors,
-#                   new_stats[0], new_stats[0] - old_stats[0],
-#                   new_stats[1], new_stats[1] - old_stats[1],))
-#        stats.append(new_stats) 
-#    
-#    remaining = nodes_order
-#    
-#    for max_diff in [0, 0, 0, 0, 0, 0, 0,
-#                     1, 0, 0, 0, 0, 0, 0,
-#                     2, 0, 0, 0, 0, 0, 0,
-#                     1, 0, 0, 0, 0, 0, 0,
-#                     2, 0, 0, 0, 0, 0, 0,
-#                     1, 0, 0, 0, 0, 0, 0,
-#                     3, 0, 0, 0, 0]:
-#        try_again = []
-#        eprint('------------ %d,  remaining %d' % (max_diff, len(remaining)))
-#        for x in remaining:
-#            num_neighbors, before, after, dd = degree_diff(G, x) #@UnusedVariable
-#    #        print('%s: diff %+3d' % (x, dd))
-#            if dd > max_diff:
-#                try_again.append(x)
-#                continue
-#            
-#            reattach = possibly_eliminate(G, x, max_dist) 
-#            if reattach:
-#                dstats(x, num_neighbors)
-#                how_to_reattach.append((x, reattach))
-#            else:
-#                try_again.append(x)
-#                
-#        remaining = try_again
-#        
-#    return G, how_to_reattach
 
-def simplify_graph_aggressive(G0, max_dist, eprint=None):
+
+def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
     if eprint is None: eprint = lambda x: None #@UnusedVariable
     how_to_reattach = []
     G = DiGraph(G0)
@@ -98,21 +37,20 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
     nodes_order = [] 
     for d in range(max_degree + 1):
         nodes_with_degree = nodes[np.nonzero(nodes_degree == d)[0]]
-        eprint('degree %3d: %d nodes' % (d, len(nodes_with_degree)))
         nodes_order.extend(nodes_with_degree.tolist())
          
-    stats = []
-    def dstats(x, nneighbors):
-        global old_stats
-        new_stats = (G.number_of_nodes(), G.number_of_edges())
-        if stats:
-            old_stats = stats[-1]
-            if 0:
-                eprint('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
-                  (x, nneighbors,
-                   new_stats[0], new_stats[0] - old_stats[0],
-                   new_stats[1], new_stats[1] - old_stats[1],))
-        stats.append(new_stats) 
+#    stats = []
+#    def dstats(x, nneighbors):
+#        global old_stats
+#        new_stats = (G.number_of_nodes(), G.number_of_edges())
+#        if stats:
+#            old_stats = stats[-1]
+#            if 0:
+#                eprint('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
+#                  (x, nneighbors,
+#                   new_stats[0], new_stats[0] - old_stats[0],
+#                   new_stats[1], new_stats[1] - old_stats[1],))
+#        stats.append(new_stats) 
     
     remaining = nodes_order
     # first remove everything with degree 2 (free lunch)
@@ -122,7 +60,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
     eprint('Elim degree 2:\n%s' % graph_degree_stats_compact(G))
   
     current_max_diff = 0
-    while True:
+    while len(remaining) > min_nodes:
         try_again = []
         eprint('------------ max_diff %d,  remaining %6d nodes, %6d edges ' % 
                 (current_max_diff, len(remaining), G.number_of_edges()))
@@ -147,31 +85,35 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None):
             
             reattach = possibly_eliminate(G, x, max_dist) 
             if reattach:
-                dstats(x, num_neighbors)
+#                dstats(x, num_neighbors)
                 how_to_reattach.append((x, reattach))
                 num_changes += 1
             else:
                 num_cannot_be_changed += 1
                 try_again.append(x)
                 
+            if len(remaining) <= min_nodes: break
+                
         remaining = try_again
         eprint(' changed %5d, remaining %5d, %5d of which fixed    %s' % 
               (num_changes, len(remaining), num_cannot_be_changed,
                '' if num_changes else "wasted"))
-        eprint('After:\n %s' % graph_degree_stats_compact(G))
+#        eprint('After:\n %s' % graph_degree_stats_compact(G))
         if num_changes:
             if num_changes > 50:
                 current_max_diff = 0
-                eprint(' too much changed, back to 0')
+#                eprint(' too much changed, back to 0')
             else:
                 eprint(' lowest diff is %d' % lowest_diff_remaining)
-                current_max_diff = lowest_diff_remaining * 1
+                current_max_diff = lowest_diff_remaining
         else:
             if num_cannot_be_changed == len(try_again):
                 break
             eprint(' lowest diff is %d' % lowest_diff_remaining)
-            current_max_diff = lowest_diff_remaining * 1 
+            current_max_diff = lowest_diff_remaining 
         
+        if current_max_diff > 0:
+            current_max_diff *= 2
     return G, how_to_reattach
 
 def remove_degree2(G, degree, remaining, how_to_reattach):
@@ -218,9 +160,15 @@ def possibly_eliminate(G, x, max_dist):
     neighbors = G.neighbors(x)
 
     reduce = neighbors
-#    if False and len(neighbors) > 6:
-#        cliques = neighbors_cliques(G, x)
-#        reduce = [list(m)[0] for m in cliques]
+    max_neighbors = 9
+    if True and len(neighbors) > max_neighbors:
+        cliques = neighbors_cliques(G, x)
+        reduce = [list(m)[0] for m in cliques]
+        
+        remaining = list(neighbors)
+        for r in reduce: remaining.remove(r)
+        while len(reduce) < max_neighbors:
+            reduce.append(remaining.pop(np.random.randint(len(remaining) - 1)))
     
     if len(reduce) > 1:
         for u, v in itertools.product(reduce, reduce):
