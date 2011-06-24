@@ -44,7 +44,10 @@ def markers_constraints(G, scale=1):
     it2node = G.nodes()
     node2it = dict([(node, it) for it, node in enumerate(it2node) ])
     eye = SE2.unity()
+    
+        
     for u, v in G.edges():
+        if u > v: continue
         i = node2it[u]
         j = node2it[v]        
         pose = G[u][v]['pose']
@@ -54,6 +57,9 @@ def markers_constraints(G, scale=1):
         for r in range(6):
             for s in range(6):
                 Dall[indices[r], indices[s]] = Dset[r, s]
+                Dall[indices[s], indices[r]] = Dset[r, s]
+                
+    
     return Dall
 
 def markers_constraints_sparse(G, scale=1):
