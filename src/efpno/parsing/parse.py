@@ -113,9 +113,11 @@ commands['SOLVE_STATE'] = cmd_solve_state
 commands['QUERY_STATE'] = cmd_query_state
 
 def parse_command_stream(stream, raise_if_unknown=False):
-    for line in stream:
-        sys.stderr.write('< %r\n' % line)
-        sys.stderr.flush()
+    while True:
+        line = stream.readline()
+        if line == '': break
+#        sys.stderr.write('< %r\n' % line)
+#        sys.stderr.flush()
         line = line.strip()
         if not line: 
             continue

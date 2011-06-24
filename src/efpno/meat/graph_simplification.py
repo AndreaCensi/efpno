@@ -1,10 +1,8 @@
 import itertools
 from contracts import contract
 from ..math import np, SE2_to_distance, pose_average
-from ..graphs import DiGraph , assert_well_formed
-from efpno.graphs.performance import graph_degree_stats, \
-    graph_degree_stats_compact
-import sys
+from ..graphs import DiGraph , assert_well_formed, graph_degree_stats_compact
+
 
 def randomly_permute(sequence):
     p = np.random.permutation(len(sequence))
@@ -39,32 +37,23 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
         nodes_with_degree = nodes[np.nonzero(nodes_degree == d)[0]]
         nodes_order.extend(nodes_with_degree.tolist())
          
-#    stats = []
-#    def dstats(x, nneighbors):
-#        global old_stats
-#        new_stats = (G.number_of_nodes(), G.number_of_edges())
-#        if stats:
-#            old_stats = stats[-1]
-#            if 0:
-#                eprint('%4d: %4d nei %4d nodes (%+3d) %4d (%+3d) edges' % 
-#                  (x, nneighbors,
-#                   new_stats[0], new_stats[0] - old_stats[0],
-#                   new_stats[1], new_stats[1] - old_stats[1],))
-#        stats.append(new_stats) 
-    
     remaining = nodes_order
-    # first remove everything with degree 2 (free lunch)
-    eprint('Initial:\n%s' % graph_degree_stats_compact(G))
     
+    eprint('In this phase, we remove ') # TODO:
+    # first remove every node with degree 2 
     remaining = remove_degree2(G, 2, remaining, how_to_reattach)
-    eprint('Elim degree 2:\n%s' % graph_degree_stats_compact(G))
-  
+    
     current_max_diff = 0
+    num_iteration = 0
     while len(remaining) > min_nodes:
-        try_again = []
-        eprint('------------ max_diff %d,  remaining %6d nodes, %6d edges ' % 
-                (current_max_diff, len(remaining), G.number_of_edges()))
+        # Some debug information
+        num_iteration += 1
+        num_nodes_before = G.number_of_nodes()
+        num_edges_before = G.number_of_edges()
         
+        # Nodes that could not be removed
+        try_again = []
+         
         num_changes = 0
         num_cannot_be_changed = 0
         
@@ -84,8 +73,7 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
                 continue
             
             reattach = possibly_eliminate(G, x, max_dist) 
-            if reattach:
-#                dstats(x, num_neighbors)
+            if reattach: 
                 how_to_reattach.append((x, reattach))
                 num_changes += 1
             else:
@@ -95,25 +83,31 @@ def simplify_graph_aggressive(G0, max_dist, eprint=None, min_nodes=0):
             if len(remaining) <= min_nodes: break
                 
         remaining = try_again
-        eprint(' changed %5d, remaining %5d, %5d of which fixed    %s' % 
-              (num_changes, len(remaining), num_cannot_be_changed,
-               '' if num_changes else "wasted"))
-#        eprint('After:\n %s' % graph_degree_stats_compact(G))
+    
         if num_changes:
             if num_changes > 50:
                 current_max_diff = 0
-#                eprint(' too much changed, back to 0')
             else:
-                eprint(' lowest diff is %d' % lowest_diff_remaining)
                 current_max_diff = lowest_diff_remaining
         else:
             if num_cannot_be_changed == len(try_again):
                 break
-            eprint(' lowest diff is %d' % lowest_diff_remaining)
             current_max_diff = lowest_diff_remaining 
         
         if current_max_diff > 0:
             current_max_diff *= 2
+            
+        eprint('it %3d: before: %5d nodes, %5d edges; max_diff: %2d,'
+               ' changed %5d, now %5d nodes (fixed: %5d), min_diff: %5d' % 
+              (num_iteration,
+               num_nodes_before,
+               num_edges_before,
+               current_max_diff,
+               num_changes,
+               len(remaining),
+               num_cannot_be_changed,
+               lowest_diff_remaining))
+
     return G, how_to_reattach
 
 def remove_degree2(G, degree, remaining, how_to_reattach):

@@ -21,14 +21,14 @@ def main():
     parser.add_option("--fast", default=False, action='store_true',
                       help='Disables sanity checks.')
 
-    parser.add_option("--max_dist", default=10, type='float',
+    parser.add_option("--max_dist", default=15, type='float',
                       help='[= %default] Maximum distance for graph simplification.')
     parser.add_option("--min_nodes", default=250, type='float',
                       help='[= %default] Minimum number of nodes to simplify to.')
-    parser.add_option("--scale", default=10, type='float',
+    parser.add_option("--scale", default=10000, type='float',
                       help='[= %default] Controls the weight of angular vs linear .')
     
-    parser.add_option("--seed", default=None, type='int',
+    parser.add_option("--seed", default=42, type='int',
                       help='[= %default] Seed for random number generator.')
     
     (options, args) = parser.parse_args() #@UnusedVariable
@@ -37,6 +37,7 @@ def main():
     
     if options.fast:
         disable_all()
+    # TODO: warn
     
     if len(args) > 1:
         raise Exception('Too many arguments')
