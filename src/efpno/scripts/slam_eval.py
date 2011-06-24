@@ -1,11 +1,12 @@
-from efpno.algorithms import EFPNO_S
-from efpno.graphs import DiGraph
-from efpno.parsing import AddEdge2D, AddVertex2D, Equiv, SolveState, QueryState, \
-    graph_apply_operation, parse_command_stream
 from geometry import translation_angle_from_SE2
 from optparse import OptionParser
 import numpy as np
 import sys
+
+from ..algorithms import EFPNO_S
+from ..graphs import DiGraph
+from ..parsing import AddEdge2D, AddVertex2D, Equiv, SolveState, QueryState, \
+    graph_apply_operation, parse_command_stream
 
 def eprint(x):
     sys.stderr.write(x)

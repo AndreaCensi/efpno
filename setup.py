@@ -36,13 +36,13 @@ setup(name='efpno',
         entry_points={
          'console_scripts': [
            'efpno_test_parsing_stream = efpno.parsing.parse:main',
-           'efpno_evaluation = efpno.script.evaluation_main:main',
-           'efpno_simplify = efpno.script.simplify:main',
-           'efpno_pipe = efpno.script.pipe:main',
-           'efpno_plot = efpno.script.plot:main',
-           'efpno_solve = efpno.script.solve:main',
+           'efpno_evaluation = efpno.statistics.evaluation_main:main',
            'efpno_tc_grid = efpno.graphs.grid:main',
-           'efpno_slam_eval = efpno.script.slam_eval:main',
+           'efpno_simplify = efpno.script.simplify:main',
+           'efpno_pipe = efpno.scripts.pipe:main',
+           'efpno_plot = efpno.scripts.plot:main',
+           'efpno_solve = efpno.scripts.solve:main',
+           'efpno_slam_eval = efpno.scripts.slam_eval:main',
         ]
     }
 

@@ -1,7 +1,6 @@
 import itertools
-from contracts import contract
 from ..math import np, SE2_to_distance, pose_average
-from ..graphs import DiGraph , assert_well_formed, graph_degree_stats_compact
+from ..graphs import DiGraph , assert_well_formed
 
 
 def randomly_permute(sequence):

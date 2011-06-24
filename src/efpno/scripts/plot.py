@@ -1,14 +1,12 @@
-import sys
-from efpno.script.loading import load_graph, smart_load
-from efpno.parsing.write import graph_write
+from contracts import disable_all
+from ..graphs import graph_degree_stats, graph_errors, graph_errors_print
+from ..parsing import smart_load
+from ..report import (report_add_coordinates_and_edges,
+    report_add_distances_errors_plot)
 from optparse import OptionParser
-import os
 from reprep import Report
-from efpno.report.report import report_add_coordinates_and_edges, \
-    report_add_distances_errors_plot
-from contracts.enabling import disable_all
-from efpno.graphs.performance import graph_degree_stats, graph_errors, \
-    graph_errors_print
+import os
+
 
 usage = """
 

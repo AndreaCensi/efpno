@@ -1,18 +1,9 @@
 import sys
 import os
-from efpno.parsing.graph_building import load_graph
-from efpno.graphs.checking import assert_well_formed
+from ..graphs import assert_well_formed
 
-EUCLIDEAN2D = 'E2D'
+from .graph_building import load_graph
 
-class TestCase(object):
-    def __init__(self, tcid, G, geometry=EUCLIDEAN2D):
-        self.tcid = tcid
-        self.G = G
-        self.has_ground_truth = False
-    
-
-    
 import cPickle as pickle
 
 def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
@@ -69,11 +60,3 @@ def smart_load(filename, use_cache=True, progress=True, raise_if_unknown=True):
 
     assert_well_formed(G)    
     return G
-    
-# TODO: move away
-
-def load_log_tc(filename):
-    with open(filename) as f:
-        G = load_graph(f)
-    tc = TestCase(filename, G=G)
-    return tc

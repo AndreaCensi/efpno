@@ -1,10 +1,9 @@
+from ..algorithms import EFPNO_S
+from ..parsing import graph_write, smart_load
 from contracts import disable_all
-from efpno.algorithms import EFPNO_S
-from efpno.parsing import graph_write
 from optparse import OptionParser
-import sys
 import numpy as np
-from .loading import smart_load
+import sys
 
 usage = """
 

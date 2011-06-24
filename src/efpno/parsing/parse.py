@@ -1,7 +1,7 @@
 import sys
+from . import (AddVertex2D, AddEdge2D, Unknown, Equiv, SolveState, QueryState,
+    Fix)
 from ..math import np, SE2_from_xytheta
-from . import AddVertex2D, AddEdge2D, Unknown
-from efpno.parsing.structures import Equiv, SolveState, QueryState, Fix
 
 def parse_line(line):
     # remove ending ';'

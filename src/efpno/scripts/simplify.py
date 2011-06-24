@@ -1,10 +1,9 @@
 import sys
 from optparse import OptionParser
 from contracts import disable_all
+from ..parsing import graph_write, smart_load
+from ..meat import simplify_graph_aggressive
 from ..math import np
-from efpno.parsing.write import graph_write
-from .loading import smart_load
-from efpno.meat.graph_simplification import simplify_graph_aggressive
 
 def main():
     np.seterr(all='raise')

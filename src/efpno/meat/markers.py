@@ -1,6 +1,6 @@
 from contracts import contract
 from ..math import direction, np, SE2_from_translation_angle
-from geometry.basic_utils import assert_allclose
+from geometry import assert_allclose
 
 @contract(S='array[2xN]', returns='list(SE2)')
 def markers2poses(S):
