@@ -1,0 +1,53 @@
+Installation instructions
+=========================
+
+See the website:
+
+   http://andreacensi.github.com/efpno/  
+   
+for the complete documentation.
+
+
+These installation instructions have been tested on Ubuntu 10.04.
+
+First, install the requirements that come as Ubuntu packages:
+
+    $ sudo apt-get install python-pip python-numpy python-scipy git-core python-nose
+	
+Then, install a few Python packages using ``pip``:
+	 
+	$ sudo pip install --upgrade PyContracts
+	$ sudo pip install --upgrade PyGeometry
+	$ sudo pip install --upgrade RepRep
+
+At this point, install the executables: ::
+
+	$ cd efpno
+	$ sudo python setup.py develop
+
+
+
+Usage snippets
+--------------
+ 
+
+This is an example of using the RSS2011 workshop ``evaluation`` program: ::
+
+	evaluation `which efpno_slam_eval` /data/manhattanOlson3500.txt  0 > log
+
+
+``efpno_solve`` reads a graph and optimizes it. Usage: ::
+
+	efpno_solve [options] logfile > output
+
+
+``efpno_simplify`` does only  the simplification step. Usage: ::
+
+	efpno_solve [options] logfile > output
+
+	
+``efpno_plot`` creates a few figures. Usage: ::
+
+	efpno_plot [options] --outdir REPORT_DIR  logfile 
+	
+
