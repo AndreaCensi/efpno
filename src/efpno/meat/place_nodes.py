@@ -10,7 +10,6 @@ def place_other_nodes(G, paths, landmarks, Sl, nref):
     
     S = np.zeros((ndim, n))
     for i in range(n):
-#                self.progress('placing other nodes', i, n)
         i_to_landmarks = [(l, len(paths[landmarks[l]][i])) 
                           for l in range(nlandmarks)]
 
@@ -18,8 +17,7 @@ def place_other_nodes(G, paths, landmarks, Sl, nref):
         references = np.zeros((ndim, nref))
         distances = np.zeros(nref)
         for r in range(len(shortest)):
-            l, length = shortest[r]
-            #  print('node %5d to landmark %5d = %5d steps' % (i, l, length))
+            l, length = shortest[r] #@UnusedVariable
             diff = reconstruct(G, paths[landmarks[l]][i])
             references[:, r] = Sl[:, l]
             distances[r] = SE2_to_distance(diff)
@@ -51,19 +49,17 @@ def place_other_nodes_mref(G, paths, landmarks, landmarks_solutions, nref):
     
     for i in range(n):
         # We should not move landmarks... should we?
-#        if i in landmarks:
-#            G2.add_node(i, pose=landmarks_solutions.node[i]['pose'])
-#            continue
+        #        if i in landmarks:
+        #            G2.add_node(i, pose=landmarks_solutions.node[i]['pose'])
+        #            continue
             
-#                self.progress('placing other nodes', i, n)
         i_to_landmarks = [(l, len(paths[landmarks[l]][i])) 
                           for l in range(nlandmarks)]
 
         shortest = sorted(i_to_landmarks, key=lambda x:x[1])[:nref]
         guesses = []
         for r in range(len(shortest)):
-            l, length = shortest[r]
-            #  print('node %5d to landmark %5d = %5d steps' % (i, l, length))
+            l, length = shortest[r] #@UnusedVariable
             lpose = landmarks_solutions.node[l]['pose']
             diff = reconstruct(G, paths[landmarks[l]][i])
             guess = np.dot(lpose, diff)

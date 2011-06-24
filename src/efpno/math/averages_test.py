@@ -1,10 +1,10 @@
-from efpno.math import random_SE2, np, pose_average, SE2 
+from . import random_SE2, np, pose_average, SE2 
 
 
 def pose_average_test():
     g = random_SE2(max_t=10)
     poses = []
-    for i in range(3):
+    for i in range(3): #@UnusedVariable
         h = random_SE2(max_t=1, max_theta=np.pi / 2)
         h_inv = np.linalg.inv(h)
         poses.append(np.dot(g, h)) 
@@ -24,7 +24,7 @@ def pose_average_test_1():
      np.array([[ 0.94485296, 0.32749486, -0.71541909],
        [-0.32749486, 0.94485296, -0.47418934],
        [ 0.        , 0.        , 1.        ]])]
-    average = pose_average(poses, debug=True)
+    pose_average(poses, debug=True)
     
 array = np.array
 

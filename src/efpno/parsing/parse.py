@@ -1,7 +1,7 @@
 import sys
+from . import (AddVertex2D, AddEdge2D, Unknown, Equiv, SolveState, QueryState,
+    Fix)
 from ..math import np, SE2_from_xytheta
-from . import AddVertex2D, AddEdge2D, Unknown
-from efpno.parsing.structures import Equiv, SolveState, QueryState, Fix
 
 def parse_line(line):
     # remove ending ';'
@@ -27,6 +27,8 @@ def cmd_vertex2(cmd, rest): #@UnusedVariable
     args = parse_line(rest)
     id = args[0]
     if len(args) > 1:
+        if len(args) != 4:
+            raise Exception('Malformed vertex command with params %r' % rest)
         xyt = args[1:4]
         pose = SE2_from_xytheta(np.array(xyt))
     else:
@@ -95,6 +97,7 @@ def cmd_fix(cmd, rest): #@UnusedVariable
     return Fix(args[0])
     
 commands = {}
+# Wow, please find some agreement on these!
 commands['VERTEX2'] = cmd_vertex2
 commands['VERTEX_SE2'] = cmd_vertex2
 commands['VERTEX_XYT'] = cmd_vertex2
@@ -114,11 +117,11 @@ commands['QUERY_STATE'] = cmd_query_state
 
 def parse_command_stream(stream, raise_if_unknown=False):
     while True:
-        line = stream.readline()
-        if line == '': break
+        oline = stream.readline()
+        if oline == '': break
 #        sys.stderr.write('< %r\n' % line)
 #        sys.stderr.flush()
-        line = line.strip()
+        line = oline.strip()
         if not line: 
             continue
         if line[-1] == '\n': line = line[:-1]
@@ -127,7 +130,12 @@ def parse_command_stream(stream, raise_if_unknown=False):
         for command in commands:
             if line.startswith(command):
                 rest = line[len(command):]
-                yield commands[command](command, rest)
+                try:
+                    result = commands[command](command, rest)
+                except Exception as e:
+                    msg = 'Could not parse line %r;\n%s' % (oline, e)
+                    raise Exception(msg)
+                yield result
                 break
         else:
             if raise_if_unknown:

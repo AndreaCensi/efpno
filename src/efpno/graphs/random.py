@@ -1,5 +1,5 @@
 import itertools
-from ..math import random_SE2, SE2_to_distance, pose_diff, np
+from ..math import random_SE2, SE2_to_distance, pose_diff
 from . import DiGraph
 
 

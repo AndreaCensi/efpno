@@ -1,6 +1,6 @@
 import sys
-from efpno.script.loading import load_graph
-from efpno.parsing.write import graph_write
+from ..parsing import graph_write
+from .loading import load_graph
 
 def main():
     fin = sys.stdin

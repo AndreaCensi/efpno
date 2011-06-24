@@ -1,5 +1,5 @@
 from reprep import Report
-from ..math import np, translation_angle_from_SE2
+from ..math import translation_angle_from_SE2
 from ..graphs import  graph_errors_print
 
 

@@ -1,7 +1,6 @@
-from efpno.script.loading import load_log_tc
+from .loading import load_log_tc
 from collections import namedtuple
-from efpno.algorithms.simplification import EFPNO_S
-from efpno.algorithms.efpno2 import EFPNO3
+from ..algorithms import EFPNO_S, EFPNO3
 
 Combination = namedtuple('Combination', 'algorithms test_cases')
 

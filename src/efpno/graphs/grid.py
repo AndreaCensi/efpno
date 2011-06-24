@@ -44,7 +44,7 @@ def main():
     """
 
     from optparse import OptionParser
-    from efpno.parsing.write import graph_write
+    from ..parsing.write import graph_write
     parser = OptionParser(usage=usage)
 
     parser.add_option("--outdir", default='.')

@@ -1,14 +1,12 @@
-import sys
-from efpno.script.loading import load_graph, smart_load
-from efpno.parsing.write import graph_write
+from contracts import disable_all
+from ..graphs import graph_degree_stats, graph_errors, graph_errors_print
+from ..parsing import smart_load
+from ..report import (report_add_coordinates_and_edges,
+    report_add_distances_errors_plot)
 from optparse import OptionParser
-import os
 from reprep import Report
-from efpno.report.report import report_add_coordinates_and_edges, \
-    report_add_distances_errors_plot
-from contracts.enabling import disable_all
-from efpno.graphs.performance import graph_degree_stats, graph_errors, \
-    graph_errors_print
+import os
+
 
 usage = """
 
@@ -23,15 +21,15 @@ def main():
 
     parser.add_option("--outdir", default='.')
     
-    parser.add_option("--fast", default=False, action='store_true',
-                      help='Disables sanity checks.')
+    parser.add_option("--slow", default=False, action='store_true',
+                      help='Enables sanity checks.')
     
     parser.add_option("--stats", default=False, action='store_true',
                       help='Computes statistics.')
     
     (options, args) = parser.parse_args() #@UnusedVariable
     
-    if options.fast:
+    if not options.slow:
         disable_all()
     
     if len(args) > 1:

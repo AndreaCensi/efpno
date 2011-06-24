@@ -4,7 +4,6 @@ from . import poses2markers, markers2poses, markers_constraints
 
 
 def improve_guess(G, G_guess):
-    n = G.number_of_nodes()
     nodes = G.nodes()
     poses_guess = [ G_guess.node[u]['pose'] for u in nodes]
     print('Computing markers') 

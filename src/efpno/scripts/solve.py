@@ -1,25 +1,25 @@
-import sys, numpy as np
-from efpno.script.loading import  smart_load
-from efpno.parsing.write import graph_write
-from optparse import OptionParser 
-from contracts.enabling import disable_all 
-from efpno.algorithms.simplification import EFPNO_S
+from ..algorithms import EFPNO_S
+from ..parsing import graph_write, smart_load
+from contracts import disable_all
+from optparse import OptionParser
+import numpy as np
+import sys
 
 usage = """
 
-    %cmd   [--outdir DIRECTORY]   [filename]  
+    %prog [options] [filename]  
 
+    With no options, it reads from stdin.
+    
     Other arguments:
-        --fast  does not use contracts checks
+        --slow  uses contracts checks
 """ 
 
 def main():
     parser = OptionParser(usage=usage)
 
-    parser.add_option("--outdir", default='.')
-    
-    parser.add_option("--fast", default=False, action='store_true',
-                      help='Disables sanity checks.')
+    parser.add_option("--slow", default=False, action='store_true',
+                      help='Enables sanity checks.')
 
     parser.add_option("--max_dist", default=15, type='float',
                       help='[= %default] Maximum distance for graph simplification.')
@@ -35,7 +35,7 @@ def main():
     
     np.random.seed(options.seed)    
     
-    if options.fast:
+    if not options.slow:
         disable_all()
     # TODO: warn
     
@@ -54,7 +54,7 @@ def main():
     results = instance.solve(G)
 
     G2 = results['solution']
-#    G2 = results['G_landmarks']
+    # G2 = results['G_landmarks']
 
     G2.graph['name'] = '%s-solved%dm' % (G.graph['name'], options.max_dist)
     graph_write(G2, sys.stdout)
