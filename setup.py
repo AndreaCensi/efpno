@@ -4,18 +4,18 @@ from setuptools import setup, find_packages
 version = "0.1"
 
 description = """ A solver for pose network optimization problems. """
+long_description = description 
 
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
     
-long_description = read('README.rst')
     
 
 setup(name='efpno',
       author="Andrea Censi",
       author_email="andrea@cds.caltech.edu",
-      url='http://www.cds.caltech.edu/~andrea/',
+      url='http://andreacensi.github.com/efpno/',
       
       description=description,
       long_description=long_description,
