@@ -19,7 +19,7 @@ setup(name='efpno',
       
       description=description,
       long_description=long_description,
-      keywords="slam mapping",
+      keywords="SLAM mapping robotics pose network optimization",
       license="LGPL",
       
       classifiers=[

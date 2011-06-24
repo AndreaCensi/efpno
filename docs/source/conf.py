@@ -56,8 +56,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PROJECT_NAME'
-copyright = u'2010, AUTHOR_NAME'
+project = u'EFPNO'
+copyright = u'2011, Andrea Censi'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -66,13 +66,15 @@ copyright = u'2010, AUTHOR_NAME'
 # The short X.Y version.
 
 try: 
-    import MAIN_PACKAGE
+    # import efpno
 
-    version = MAIN_PACKAGE.__version__
+    # version = efpno.__version__
     # The full version, including alpha/beta/rc tags.
-    release = MAIN_PACKAGE.__version__
+    # release = efpno.__version__
+    version = '0.1'
+    release= version
 except:
-    print('---- Warning: could not get version info; is "MAIN_PACKAGE" installed?')
+    print('---- Warning: could not get version info; is "efpno" installed?')
     version = 'unknown'
     release = 'unknown'
     
@@ -116,9 +118,9 @@ pygments_style = 'friendly'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'default'
+# html_theme = 'default'
 # html_theme = 'haiku'
-# html_theme = 'nature'
+html_theme = 'nature'
  
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -191,7 +193,7 @@ html_static_path = ['my_static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PROJECT_UNIX_NAME_doc'
+htmlhelp_basename = 'efpno_doc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -205,8 +207,8 @@ htmlhelp_basename = 'PROJECT_UNIX_NAME_doc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PROJECT_UNIX_NAME.tex', u'PROJECT_NAME Documentation',
-   u'AUTHOR_NAME', 'manual'),
+  ('index', 'efpno.tex', u'EFPNO Documentation',
+   u'Andrea Censi', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -232,6 +234,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'PROJECT_UNIX_NAME', u'PROJECT_NAME Documentation',
-     [u'AUTHOR_NAME'], 1)
+    ('index', 'efpno', u'EFPNO Documentation',
+     [u'Andrea Censi'], 1)
 ]

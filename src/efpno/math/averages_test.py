@@ -24,7 +24,7 @@ def pose_average_test_1():
      np.array([[ 0.94485296, 0.32749486, -0.71541909],
        [-0.32749486, 0.94485296, -0.47418934],
        [ 0.        , 0.        , 1.        ]])]
-    pose_average(poses, debug=True)
+    pose_average(poses, debug=False)
     
 array = np.array
 
@@ -37,14 +37,15 @@ def pose_average_test_2():
        [ 0.        , 0.        , 1.        ]])]
     
     weights = [ 0.50932717, 0.49067283]
-    pose_average(poses, weights, debug=True)
+    pose_average(poses, weights, debug=False)
     
 def pose_average_test_3():
     poses = [array([[-0.99882934, 0.04837305, -3.04662208],
        [-0.04837305, -0.99882934, -0.14072737],
-       [ 0.        , 0.        , 1.        ]]), array([[-0.99882934, 0.04837306, -3.04662384],
+       [ 0.        , 0.        , 1.        ]]),
+             array([[-0.99882934, 0.04837306, -3.04662384],
        [-0.04837306, -0.99882934, -0.14073033],
        [ 0.        , 0.        , 1.        ]])]
     weights = [ 0.66712901, 0.33287099]
-    pose_average(poses, weights, debug=True)
+    pose_average(poses, weights, debug=False)
 

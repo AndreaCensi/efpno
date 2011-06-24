@@ -1,9 +1,12 @@
-from ..graphs import (all_pairs_shortest_path, graph_errors, graph_errors_print, DiGraph)
+from . import Algorithm
+from ..graphs import (all_pairs_shortest_path, graph_errors, graph_errors_print,
+                      DiGraph, graph_fix_node)
+from ..meat import (simplify_graph_aggressive, reattach, solve_by_reduction,
+    compute_fully_connected_subgraph)
+from geometry import SE2_from_xytheta
 
-from ..meat import (simplify_graph_aggressive, reattach,
-        solve_by_reduction, compute_fully_connected_subgraph)
 
-from . import Algorithm       
+
 
 class EFPNO_S(Algorithm):
     
@@ -43,6 +46,9 @@ class EFPNO_S(Algorithm):
         solution = DiGraph(G)
         for x in G.nodes():
             solution.node[x]['pose'] = G_all.node[x]['pose']
+            
+        head = sorted(G.nodes())[0]
+        graph_fix_node(G, head, SE2_from_xytheta([0, 0, 0]))
             
         self.phase('stats:computing graph_errors')
         # note that this is a dense graph

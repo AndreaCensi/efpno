@@ -17,11 +17,12 @@ scale=10000
 for log in $logs; do
 	source=$data/$log.g2o
 	efpno_plot --stats  --outdir $out/reports $source
-	
+	mkdir -p $out/source
+	cp $source $out/source/$log.graph
 	for min_nodes in $nodes; do
 	for dist in $dists; do
 		mkdir -p $out/solved/
-		solved=$out/solved/$log-D$dist-N${min_nodes}-S${scale}.g2o
+		solved=$out/solved/$log-D$dist-N${min_nodes}-S${scale}.graph
 		efpno_solve  \
 			--scale $scale --max_dist $dist --min_nodes $min_nodes \
 			$source > $solved

@@ -1,12 +1,13 @@
 from geometry import translation_angle_from_SE2
 from optparse import OptionParser
+import contracts
 import numpy as np
 import sys
-
 from ..algorithms import EFPNO_S
 from ..graphs import DiGraph
-from ..parsing import AddEdge2D, AddVertex2D, Equiv, SolveState, QueryState, \
-    graph_apply_operation, parse_command_stream
+from ..parsing import (AddEdge2D, AddVertex2D, Equiv, SolveState, QueryState,
+    graph_apply_operation, parse_command_stream)
+
 
 def eprint(x):
     sys.stderr.write(x)
@@ -33,7 +34,7 @@ def main():
     (options, args) = parser.parse_args() #@UnusedVariable
     np.random.seed(options.seed)
     
-#    if not options.slow: contracts.disable_all()
+    if not options.slow: contracts.disable_all()
     
     fin = sys.stdin
     fout = sys.stdout

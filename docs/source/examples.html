@@ -1,0 +1,118 @@
+<p>
+This is the output of the algorithm using the default parameters, the same for each graph.
+</p>
+
+<p>
+    Note that the result is "decent" but nowhere near the precision of iterative methods. 
+</p>
+
+<table id="examples">
+    <tr class="header">
+        <td>Dataset</td>
+        <td>Input file</td>
+        <td>EFPNO's solution </td>
+        <td>link to full report</td>
+    </tr>
+
+    <tr>
+        <td>w10000-odom</td>
+        <td><a class="log" href="static/test_solve/source/w10000-odom.graph"/> 
+            .graph
+            </a></td>
+        <td><a class="log" href="static/test_solve/solved/w10000-odom-D15-N250-S10000.graph"/> 
+            *-D15-N250-S10000.graph
+            </a></td>
+        <td><a href="static/test_solve/reports/w10000-odom-D15-N250-S10000.html"/> 
+            D15-N250-S10000
+            </a></td>
+    </tr>
+
+    <tr>
+        <td>manhattanOlson3500</td>
+        <td><a class="log" href="static/test_solve/source/manhattanOlson3500.graph"/> 
+            .graph
+            </a></td>
+        <td><a class="log" href="static/test_solve/solved/manhattanOlson3500-D15-N250-S10000.graph"/> 
+            *-D15-N250-S10000.graph
+            </a></td>
+        <td><a href="static/test_solve/reports/manhattanOlson3500-D15-N250-S10000.html"/> 
+            D15-N250-S10000
+            </a></td>
+    </tr>
+
+    <tr>
+        <td>Intel</td>
+        <td><a class="log" href="static/test_solve/source/intel.graph"/> 
+            .graph
+            </a></td>
+        <td><a class="log" href="static/test_solve/solved/intel-D15-N250-S10000.graph"/> 
+            *-D15-N250-S10000.graph
+            </a></td>
+        <td><a href="static/test_solve/reports/intel-D15-N250-S10000.html"/> 
+            D15-N250-S10000
+            </a></td>
+    </tr>
+    
+</table>
+
+
+<style type="text/css">
+
+table#examples TD { padding-left: 1em; padding-right: 1em; }
+table#examples TD A.log { font-family: monospace; font-size: 80%;}
+tr.header { font-style: italic;}
+
+img.graph { border: solid 2px black; padding:0 ; margin: 20px; 
+            width: 75%;}
+            
+            
+         
+div.example { clear: left;  }   
+div.frame { float: left; width: 40%; text-align: center; }
+
+div.frame P { font-weight: bold; text-align: center; padding-bottom: 3px; margin-bottom: -20px;}
+h1, h2, h3, h4 { clear: both;}
+
+</style>
+
+
+
+<div class="example">
+
+    <div class="frame left">
+        <p> The <tt>manhattanOlson3500</tt> dataset </p>    
+    
+        <img class="graph" 
+         src="static/test_solve/reports/images/manhattanOlson3500:graph.png"/>
+    </div>
+    
+    <div class="frame right">
+        <p> EFPNO's one-shot solution </p>
+        <img class="graph" 
+ src="static/test_solve/reports/images/manhattanOlson3500-D15-N250-S10000:graph.png"
+    />
+    </div>
+</div>
+
+
+<div class="example">
+
+    <div class="frame left">
+        <p> The <tt>w10000</tt> dataset </p>    
+    
+        <img class="graph" 
+         src="static/test_solve/reports/images/w10000-odom:graph.png"/>
+    </div>
+    
+    <div class="frame right">
+        <p> EFPNO's one-shot solution </p>
+        <img class="graph" 
+ src="static/test_solve/reports/images/w10000-odom-D15-N250-S10000:graph.png"
+    />
+    </div>
+</div>
+
+
+
+
+
