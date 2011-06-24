@@ -6,8 +6,6 @@ from ..meat import (simplify_graph_aggressive, reattach, solve_by_reduction,
 from geometry import SE2_from_xytheta
 
 
-
-
 class EFPNO_S(Algorithm):
     
     def solve(self, G):
@@ -47,8 +45,9 @@ class EFPNO_S(Algorithm):
         for x in G.nodes():
             solution.node[x]['pose'] = G_all.node[x]['pose']
             
-        head = sorted(G.nodes())[0]
-        graph_fix_node(G, head, SE2_from_xytheta([0, 0, 0]))
+        head = sorted(solution.nodes())[0]
+        target = SE2_from_xytheta([0, 0, 0])
+        graph_fix_node(solution, head, target)
             
         self.phase('stats:computing graph_errors')
         # note that this is a dense graph
