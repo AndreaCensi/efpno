@@ -48,6 +48,7 @@ setup(name='efpno',
            'efpno_plot = efpno.script.plot:main',
            'efpno_solve = efpno.script.solve:main',
            'efpno_tc_grid = efpno.graphs.grid:main',
+           'efpno_slam_eval = efpno.script.slam_eval:main',
         ]
     }
 
