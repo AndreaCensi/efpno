@@ -3,7 +3,7 @@ from . import se2_from_SE2, SE2_from_se2, np, SE2
 import sys
 from geometry.basic_utils import assert_allclose
 
-@contract(poses='list[N](SE2),N>=1', weights='None|seq[N](>=0)',
+@contract(poses='list[N](SE2),N>=1', weights='None|seq[N](>=0)|array[N](>=0)',
           start='None|SE2', iterations='int,>=1')
 def pose_average(poses, weights=None, start=None, iterations=100, debug=False):
     # TODO: make generic
