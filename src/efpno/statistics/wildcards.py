@@ -1,4 +1,4 @@
-from contracts import contracts
+from contracts import contract
 import re
 
 def flatten(seq):
@@ -6,7 +6,7 @@ def flatten(seq):
     for l in seq: res.extend(l)
     return res
 
-@contracts(x='str|list(str)', options='list(str)', returns='list(str)')
+@contract(x='str|list(str)', options='list(str)', returns='list(str)')
 def expand_string(x, options):
     if isinstance(x, list):
         return flatten(expand_string(y, options) for y in x)
@@ -23,7 +23,7 @@ def wildcard_to_regexp(arg):
     """ Returns a regular expression from a shell wildcard expression. """
     return re.compile('\A' + arg.replace('*', '.*') + '\Z')
 
-@contracts(wildcard='str', universe='list(str)')
+@contract(wildcard='str', universe='list(str)')
 def expand_wildcard(wildcard, universe):
     ''' Expands a wildcard expression against the given list.
         wildcard: string with '*' 

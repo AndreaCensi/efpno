@@ -1,15 +1,15 @@
-from ..math import np, euclidean_distances
-from ..graphs import (
-      single_source_shortest_path, distances_matrix_metrics,
-      distances_metrics_print, constraints_and_observed_distances, graph_errors,
-    graph_errors_print)
-from ..meat import (
-        compute_fully_connected_subgraph, place_other_nodes, place_other_nodes_multi,
-        place_other_nodes_simple, place_other_nodes_mref, solve_euclidean,
-        solve_by_reduction, improve_guess)
+import numpy as np
 
-from . import Algorithm       
-       
+from . import Algorithm
+from ..graphs import (single_source_shortest_path, distances_matrix_metrics,
+    distances_metrics_print, constraints_and_observed_distances, graph_errors,
+    graph_errors_print)
+from ..math import euclidean_distances
+from ..meat import (compute_fully_connected_subgraph, place_other_nodes,
+    place_other_nodes_multi, place_other_nodes_simple, place_other_nodes_mref,
+    solve_euclidean, solve_by_reduction, improve_guess)
+
+
 class EFPNO3(Algorithm):
     def solve(self, G):
         nl = self.params['nl']

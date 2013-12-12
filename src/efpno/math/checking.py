@@ -1,4 +1,7 @@
-from . import SE2, assert_allclose, np
+
+from geometry import SE2, assert_allclose
+import numpy as np
+
 
 def assert_inverse(pose1, pose2): # TODO: make more efficient
     d = SE2.multiply(pose1, pose2)

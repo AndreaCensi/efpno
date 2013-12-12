@@ -1,7 +1,13 @@
 import sys
+import warnings
+
+from efpno import logger
+from geometry import SE2_from_xytheta
+import numpy as np
+
 from . import (AddVertex2D, AddEdge2D, Unknown, Equiv, SolveState, QueryState,
     Fix)
-from ..math import np, SE2_from_xytheta
+
 
 def parse_line(line):
     # remove ending ';'
@@ -25,7 +31,7 @@ def parse_line(line):
 
 def cmd_vertex2(cmd, rest): #@UnusedVariable
     args = parse_line(rest)
-    id = args[0]
+    vid = args[0]
     if len(args) > 1:
         if len(args) != 4:
             raise Exception('Malformed vertex command with params %r' % rest)
@@ -34,7 +40,7 @@ def cmd_vertex2(cmd, rest): #@UnusedVariable
     else:
         pose = None
         
-    return AddVertex2D(id, pose)
+    return AddVertex2D(vid, pose)
 
 #EDGE2 2344 1345 1.08126 -0.0222521 -3.13184 1 0 1 1 0 0
 
@@ -139,7 +145,11 @@ def parse_command_stream(stream, raise_if_unknown=False):
                 break
         else:
             if raise_if_unknown:
-                raise Exception('Unknown command: %r' % line)
+                warnings.warn('add option for ignoring unknown command')
+                if True:
+                    logger.warning('Ignoring unknown command: %r' % line)
+                else:
+                    raise Exception('Unknown command: %r' % line)
             else:
                 yield Unknown(line)
 

@@ -1,14 +1,11 @@
 import itertools
-from ..math import (
-                    np, mds, SE2_from_translation_angle,
-                    SE2, area, SE2_to_distance, assert_allclose,
-                    euclidean_distances
-                    )
-from ..graphs import (
-                      DiGraph, all_pairs_shortest_path, reconstruct,
-                       assert_same_nodes
-                      )
+
 from . import poses2markers, markers2poses
+from ..graphs import (DiGraph, all_pairs_shortest_path, reconstruct,
+    assert_same_nodes)
+from ..math import (np, mds, SE2_from_translation_angle, SE2, area,
+    SE2_to_distance, assert_allclose, euclidean_distances)
+
 
 def extract_distances(G):
     # TODO: check dense

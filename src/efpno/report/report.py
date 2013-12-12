@@ -52,7 +52,7 @@ def report_add_distances_errors_plot(r, nid, stats, f):
     d_c = stats['distances_constraints']
     d_e = stats['distances_estimated']
     
-    with r.data_pylab('%s-flat' % nid) as pylab:
+    with r.plot('%s-flat' % nid) as pylab:
         pylab.plot(d_c, d_e, '.')
         pylab.xlabel('constrained')
         pylab.ylabel('estimated')
@@ -62,7 +62,7 @@ def report_add_distances_errors_plot(r, nid, stats, f):
     
     r.last().add_to(f)
     
-    with r.data_pylab('%s-log' % nid) as pylab:
+    with r.plot('%s-log' % nid) as pylab:
         pylab.loglog(d_c, d_e, '.')
         pylab.xlabel('constrained')
         pylab.ylabel('estimated')
@@ -82,7 +82,7 @@ def report_add_coordinates_and_edges(r, nid, G,
                                      vertex_style=dict(color='r', alpha=0.5),
                                      edge_style=dict(color='k', alpha=0.5)):
 
-    with r.data_pylab(nid, figsize=(fs, fs)) as pylab: 
+    with r.plot(nid, figsize=(fs, fs)) as pylab:
         if plot_edges:
             xends = []
             yends = []

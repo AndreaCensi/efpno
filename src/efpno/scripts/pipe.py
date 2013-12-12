@@ -1,6 +1,8 @@
 import sys
+
 from ..parsing import graph_write
 from .loading import load_graph
+
 
 def main():
     fin = sys.stdin
