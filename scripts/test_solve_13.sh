@@ -9,7 +9,7 @@ mkdir -p $out
 # logs="manhattanOlson3500 intel w10000-odom"
 # logs="intel"
 # logs="manhattanOlson3500 w10000-odom intel"
-
+logs="input_M3500_addsmallnoise input_M3500_original"
 dists="15"
 nodes="150 200 250"
 scale=10000
